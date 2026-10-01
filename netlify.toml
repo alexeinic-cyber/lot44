@@ -1,0 +1,16 @@
+[build]
+  publish = "site"
+  # Сборка на Netlify не нужна — HTML уже готов из GitHub Actions
+  command = "echo 'Static site from CI'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"

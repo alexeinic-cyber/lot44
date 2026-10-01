@@ -1,0 +1,54 @@
+# ЛОТ 44 — ежедневная пересборка и деплой на Netlify
+# Расписание: 05:00 UTC = 08:00 МСК
+
+name: Daily build & deploy
+
+on:
+  schedule:
+    # 05:00 UTC → 08:00 Москва (UTC+3)
+    - cron: "0 5 * * *"
+  workflow_dispatch:  # ручной запуск из вкладки Actions
+
+permissions:
+  contents: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build site
+        run: |
+          python scripts/build.py
+          ls -la site/
+          test -f site/index.html
+          test -f site/heritage.html
+
+      - name: Commit updated data (cache)
+        run: |
+          git config user.name "lot44-bot"
+          git config user.email "lot44-bot@users.noreply.github.com"
+          git add data/ site/ || true
+          git diff --staged --quiet || git commit -m "chore: daily rebuild $(date -u +%Y-%m-%d)"
+          git push || true
+
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "::warning::NETLIFY secrets not set — skip deploy (site built in site/)"
+            exit 0
+          fi
+          npm install -g netlify-cli
+          netlify deploy --prod --dir=site --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
