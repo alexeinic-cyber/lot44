@@ -13,6 +13,23 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
 from urllib.request import Request, urlopen
+import ssl
+
+def _ssl_ctx():
+    ctx = ssl.create_default_context()
+    try:
+        ctx.check_hostname = True
+    except Exception:
+        pass
+    # fallback if system certs broken (common on Windows Python)
+    try:
+        import certifi
+        ctx.load_verify_locations(certifi.where())
+    except Exception:
+        ctx = ssl._create_unverified_context()
+    return ctx
+
+SSL_CTX = _ssl_ctx()
 from urllib.error import URLError, HTTPError
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,8 +42,7 @@ TORGI_API = "https://torgi.gov.ru/new/api/public/lotcards/search"
 # Костромская область в словаре ГИС Торги (dynSubjRF)
 TORGI_REGION = "47"
 HERITAGE_API = "https://xn--80aacb2b1a.xn--d1aqf.xn--p1ai/okn/api/objects"
-# запасной (punycode/латиница может отличаться)
-HERITAGE_API_ALT = "https://наследие.дом.рф/okn/api/objects"
+HERITAGE_API_ALT = "https://nasledie.dom.rf/okn/api/objects"
 
 UA = (
     "Mozilla/5.0 (compatible; LOT44Bot/1.0; +https://vk.ru/lot44) "
@@ -43,7 +59,7 @@ def http_get_json(url: str, params: dict | None = None, timeout: int = 45) -> An
         from urllib.parse import urlencode
         url = url + ("&" if "?" in url else "?") + urlencode(params)
     req = Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
-    with urlopen(req, timeout=timeout) as resp:
+    with urlopen(req, timeout=timeout, context=SSL_CTX) as resp:
         return json.loads(resp.read().decode("utf-8", errors="replace"))
 
 
