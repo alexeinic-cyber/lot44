@@ -3,7 +3,8 @@
 ЛОТ 44 — сборщик витрины торгов Костромской области (одностраничная версия).
 Запуск: python scripts/build.py
 Выход:  site/index.html  (данные: torgi.gov.ru)
-Лоты, относящиеся к объектам культурного наследия, помечаются значком «ОКН».
+Возможности витрины: фото лотов, живые таймеры приёма заявок, фильтр по цене,
+метки «ОКН» (объекты культурного наследия) и «новый» (свежие публикации).
 """
 from __future__ import annotations
 
@@ -194,18 +195,40 @@ def normalize_torgi(raw: dict) -> dict:
 
     okn = bool(OKN_RE.search(str(name) + " " + snip))
 
+    # фото лота: первое изображение через файловое хранилище портала торгов
+    imgs = raw.get("lotImages") or []
+    img = ("https://torgi.gov.ru/new/file-store/v1/" + str(imgs[0])) if imgs else ""
+
+    # числовая цена — для фильтра по диапазону
+    price_num = None
+    try:
+        if price not in (None, "", 0):
+            price_num = float(str(price).replace(" ", "").replace(",", "."))
+    except Exception:
+        price_num = None
+
+    # дата публикации — для метки «новый»
+    pub_raw = str(
+        raw.get("noticeFirstVersionPublicationDate")
+        or raw.get("createDate")
+        or ""
+    )
+
     return {
         "id": str(lot_id),
         "notice": str(notice),
         "name": str(name)[:180],
         "snip": snip,
         "price": price_str,
+        "price_num": price_num,
         "deal": deal_label,
         "form": form[:60],
         "deadline": deadline_str,
         "deadline_raw": str(deadline),
         "days_left": days_left,
         "okn": okn,
+        "img": img,
+        "pub_raw": pub_raw,
         "link": link,
         "nn": f"№ {notice} · лот {raw.get('lotNumber') or '1'}" if notice else f"лот {lot_id}",
     }
@@ -293,6 +316,24 @@ main{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
 .b.deal-Другое{background:#f3f4f6;color:#4b5563}
 .b.form{background:#f3f4f6;color:#374151}
 .b.okn{background:var(--amber);color:var(--navy)}
+.b.new{background:#d1fae5;color:#047857}
+.lot .photo{width:100%;height:170px;object-fit:cover;border-radius:10px;display:block;background:#eef1f6}
+.timer{color:var(--muted)}
+.timer.urgent{color:#b45309;font-weight:700}
+.timer.crit{color:#dc2626;font-weight:800}
+.timer.over{color:#9ca3af}
+.pslide{display:flex;flex-direction:column;gap:4px;flex:0 1 240px;min-width:210px}
+.pslide .ps-label{font-size:12.5px;color:var(--muted)}
+.pslide .ps-label b{color:var(--ink)}
+.ps-track{position:relative;height:24px}
+.ps-track input[type=range]{position:absolute;left:0;top:0;width:100%;height:24px;margin:0;background:transparent;
+  -webkit-appearance:none;appearance:none;pointer-events:none}
+.ps-track input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;background:var(--amber);border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(20,33,61,.35);cursor:pointer}
+.ps-track input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;
+  background:var(--amber);border:2px solid #fff;box-shadow:0 1px 4px rgba(20,33,61,.35);cursor:pointer}
+.ps-track::before{content:"";position:absolute;left:2px;right:2px;top:11px;height:3px;border-radius:2px;background:var(--line)}
 h3{margin:0;font-size:16px;line-height:1.35}
 .snip{margin:0;color:var(--muted);font-size:13.5px}
 .price{font-weight:800;font-size:18px;color:var(--navy)}
@@ -306,7 +347,7 @@ footer{background:var(--navy);color:#9fb0d0;padding:28px 22px;margin-top:40px;fo
 footer a{color:#FCA311;font-weight:700}
 footer .brand{color:#fff;font-weight:800;margin-bottom:8px;font-size:16px}
 footer .brand span{color:var(--amber)}
-@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}}
+@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}.pslide{flex:1 1 100%;min-width:0}}
 """
 
 JS_FILTER = """
@@ -316,29 +357,96 @@ JS_FILTER = """
   const chips = document.querySelectorAll('.chip');
   const cards = document.querySelectorAll('[data-card]');
   const count = document.getElementById('count');
+  const ps = document.getElementById('pslide');
+  const pmin = document.getElementById('pmin');
+  const pmax = document.getElementById('pmax');
+  const psLabel = document.getElementById('psLabel');
   let filter = 'Все';
+
+  function fmtPrice(v){ return Math.round(v).toLocaleString('ru-RU'); }
+
+  function priceState(){
+    if (!ps || !pmin || !pmax) return null;
+    const lo = +ps.dataset.pmin, hi = +ps.dataset.pmax;
+    const a = +pmin.value, b = +pmax.value;
+    return {a: a, b: b, lo: lo, hi: hi, full: (a <= lo && b >= hi)};
+  }
+
   function apply(){
     const term = (q?.value || '').toLowerCase().trim();
+    const pr = priceState();
     let n = 0;
     cards.forEach(c => {
       const hay = (c.dataset.search || '').toLowerCase();
       const cat = c.dataset.cat || '';
       const okCat = filter === 'Все' || cat === filter;
       const okQ = !term || hay.includes(term);
-      const show = okCat && okQ;
+      let okP = true;
+      if (pr && !pr.full){
+        const v = c.dataset.price;
+        okP = v !== '' && (+v) >= pr.a && (+v) <= pr.b;
+      }
+      const show = okCat && okQ && okP;
       c.style.display = show ? '' : 'none';
       if (show) n++;
     });
     if (count) count.textContent = 'Показано: ' + n + ' из ' + cards.length;
   }
+
+  function updatePsLabel(){
+    if (!psLabel) return;
+    const pr = priceState();
+    if (!pr || pr.full){ psLabel.textContent = 'любая'; return; }
+    const lo = pr.a <= pr.lo ? '' : 'от ' + fmtPrice(pr.a);
+    const hi = pr.b >= pr.hi ? '' : 'до ' + fmtPrice(pr.b);
+    psLabel.textContent = (lo + ' ' + hi).trim() + ' ₽';
+  }
+
   chips.forEach(ch => ch.addEventListener('click', () => {
     chips.forEach(x => x.classList.remove('on'));
     ch.classList.add('on');
     filter = ch.dataset.filter;
     apply();
   }));
-  q?.addEventListener('input', apply);
+
+  if (ps){
+    [pmin, pmax].forEach(el => el.addEventListener('input', (e) => {
+      let a = +pmin.value, b = +pmax.value;
+      if (a > b){ if (e.target === pmin) pmax.value = a; else pmin.value = b; }
+      updatePsLabel();
+      apply();
+    }));
+  }
+
+  let deb = null;
+  q?.addEventListener('input', () => {
+    clearTimeout(deb);
+    deb = setTimeout(apply, 350);
+  });
+
   apply();
+
+  function fmtLeft(ms){
+    if (ms <= 0) return 'приём заявок завершён';
+    const m = Math.floor(ms / 60000);
+    const dd = Math.floor(m / 1440), hh = Math.floor((m % 1440) / 60), mi = m % 60;
+    if (dd > 0) return 'осталось ' + dd + ' дн. ' + hh + ' ч.';
+    if (hh > 0) return 'осталось ' + hh + ' ч. ' + mi + ' мин.';
+    return 'осталось ' + mi + ' мин.';
+  }
+  function tickTimers(){
+    document.querySelectorAll('.timer[data-deadline]').forEach(el => {
+      const t = Date.parse(el.dataset.deadline);
+      if (isNaN(t)) return;
+      const left = t - Date.now();
+      el.textContent = fmtLeft(left);
+      el.classList.toggle('urgent', left > 0 && left <= 3 * 86400000);
+      el.classList.toggle('crit', left > 0 && left <= 86400000);
+      el.classList.toggle('over', left <= 0);
+    });
+  }
+  tickTimers();
+  setInterval(tickTimers, 60000);
 })();
 </script>
 """
@@ -353,13 +461,47 @@ def refresh_days(lots: list[dict]) -> None:
             L["deadline"], L["days_left"] = ds, dl
 
 
+def parse_dt(s: Any) -> datetime | None:
+    try:
+        return datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+
+def refresh_new(lots: list[dict]) -> None:
+    """Метка «новый»: публикация в последние 3 дня (считается на момент рендера)."""
+    now = now_msk()
+    for L in lots:
+        pub = parse_dt(L.get("pub_raw", ""))
+        L["is_new"] = bool(pub and (now - pub) <= timedelta(days=3))
+
+
 def render_torgi(lots: list[dict], updated: str) -> str:
     refresh_days(lots)
+    refresh_new(lots)
 
     counts = {"Продажа": 0, "Аренда": 0, "Другое": 0}
     for L in lots:
         counts[L["deal"]] = counts.get(L["deal"], 0) + 1
     okn_count = sum(1 for L in lots if L.get("okn"))
+    new_count = sum(1 for L in lots if L.get("is_new"))
+
+    # --- диапазон цен для ползунка ---
+    nums = [L["price_num"] for L in lots if L.get("price_num") is not None]
+    slider_html = ""
+    if len(nums) >= 2 and max(nums) > min(nums):
+        span = max(nums) - min(nums)
+        step = 1000 if span <= 2_000_000 else (5000 if span <= 10_000_000 else 10000)
+        pmin_r = int(min(nums) // step * step)
+        pmax_r = -(-int(max(nums)) // step * step)
+        slider_html = f'''
+  <div class="pslide" id="pslide" data-pmin="{pmin_r}" data-pmax="{pmax_r}">
+    <div class="ps-label">Цена: <b id="psLabel">любая</b></div>
+    <div class="ps-track">
+      <input type="range" id="pmin" aria-label="Минимальная цена" min="{pmin_r}" max="{pmax_r}" step="{step}" value="{pmin_r}">
+      <input type="range" id="pmax" aria-label="Максимальная цена" min="{pmin_r}" max="{pmax_r}" step="{step}" value="{pmax_r}">
+    </div>
+  </div>'''
 
     # sort: urgent first, then by deadline
     def sort_key(L):
@@ -372,26 +514,39 @@ def render_torgi(lots: list[dict], updated: str) -> str:
 
     cards = []
     for L in lots_sorted:
-        urgent = ""
-        if L["days_left"] is not None:
-            if L["days_left"] <= 0:
-                urgent = '<span class="urgent">осталось 0 дн.</span>'
-            elif L["days_left"] <= 3:
-                urgent = f'<span class="urgent">осталось {L["days_left"]} дн.</span>'
-            else:
-                urgent = f'<span>осталось {L["days_left"]} дн.</span>'
+        d = L["days_left"]
+        t_cls = "timer"
+        if d is not None and d <= 0:
+            t_cls += " over"
+            static = "приём завершён"
+        elif d is not None and d <= 1:
+            t_cls += " crit"
+            static = f'осталось {d} дн.'
+        elif d is not None and d <= 3:
+            t_cls += " urgent"
+            static = f'осталось {d} дн.'
+        else:
+            static = f'осталось {d} дн.' if d is not None else ""
+        dl = L.get("deadline_raw") or ""
+        timer = (f'<span class="{t_cls}" data-deadline="{esc(dl)}">{static}</span>'
+                 if dl else f'<span class="{t_cls}">{static}</span>')
         okn_span = '<span class="b okn" title="Объект культурного наследия">ОКН</span>' if L.get("okn") else ''
+        new_span = '<span class="b new" title="Опубликован недавно">новый</span>' if L.get("is_new") else ''
+        photo = (f'<img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" '
+                 f'src="{esc(L["img"])}" alt="">') if L.get("img") else ''
+        price_attr = f'{L["price_num"]:.0f}' if L.get("price_num") is not None else ''
         search = f"{L['name']} {L['snip']} {L['nn']} {L['notice']}" + (" ОКН" if L.get("okn") else "")
         cards.append(f'''
-<article class="lot" data-card data-cat="{L['deal']}" data-search="{esc(search)}">
+<article class="lot" data-card data-cat="{L['deal']}" data-price="{price_attr}" data-search="{esc(search)}">
+  {photo}
   <div class="badges">
-    {okn_span}<span class="b deal-{L['deal']}">{esc(L['deal'])}</span>
+    {new_span}{okn_span}<span class="b deal-{L['deal']}">{esc(L['deal'])}</span>
     <span class="b form">{esc(L['form'])}</span>
   </div>
   <h3>{esc(L['name'])}</h3>
   <p class="snip">{esc(L['snip'])}</p>
   <div><span class="price">{esc(L['price'])}</span></div>
-  <div class="meta2"><span class="end">{esc(L['deadline'])}</span>{urgent}</div>
+  <div class="meta2"><span class="end">{esc(L['deadline'])}</span>{timer}</div>
   <div class="foot">
     <a href="{esc(L['link'])}" target="_blank" rel="noopener">Портал торгов ↗</a>
     <span class="nn">{esc(L['nn'])}</span>
@@ -405,6 +560,7 @@ def render_torgi(lots: list[dict], updated: str) -> str:
     )
 
     okn_meta = f" · ОКН: {okn_count}" if okn_count else ""
+    new_meta = f" · новых: {new_count}" if new_count else ""
 
     return f"""<!DOCTYPE html>
 <html lang="ru">
@@ -422,15 +578,16 @@ def render_torgi(lots: list[dict], updated: str) -> str:
       <span style="color:#9fb0d0;font-size:14px">агрегатор торгов</span></div>
     <h1>Торги Костромской области — актуальные лоты</h1>
     <p>Продажа и аренда государственного и муниципального имущества, публичные предложения — одним списком.
-       Данные: портал торгов <strong>torgi.gov.ru</strong>. Лоты-объекты культурного наследия отмечены значком <strong>ОКН</strong>.</p>
+       Данные: портал торгов <strong>torgi.gov.ru</strong>. Лоты-объекты культурного наследия отмечены значком <strong>ОКН</strong>,
+       свежие публикации — меткой <strong>новый</strong>.</p>
     <div class="meta">Обновлено: {esc(updated)} · активных лотов: {len(lots)}
-      (Аренда: {counts.get('Аренда',0)} · Другое: {counts.get('Другое',0)} · Продажа: {counts.get('Продажа',0)}){okn_meta}
+      (Аренда: {counts.get('Аренда',0)} · Другое: {counts.get('Другое',0)} · Продажа: {counts.get('Продажа',0)}){okn_meta}{new_meta}
       · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
   </div>
 </header>
 <div class="controls">
   <input type="search" id="q" placeholder="Поиск: объект, адрес, кадастровый номер, № извещения…" autocomplete="off">
-  <div class="chips">{chip_html}</div>
+  <div class="chips">{chip_html}</div>{slider_html}
   <span class="count" id="count">Показано: {len(lots)} из {len(lots)}</span>
 </div>
 <main>
@@ -502,7 +659,9 @@ def main() -> int:
             print("[torgi] кэша нет — оставляю неполный набор", len(lots), file=sys.stderr)
 
     (SITE / "index.html").write_text(render_torgi(lots, updated), encoding="utf-8")
-    print(f"[ok] site/index.html ({len(lots)} lots)")
+    n_photos = sum(1 for L in lots if L.get("img"))
+    n_new = sum(1 for L in lots if L.get("is_new"))
+    print(f"[ok] site/index.html ({len(lots)} lots, {n_photos} with photo, {n_new} new)")
     print(f"[ok] updated {updated}")
     print(("STATUS: OK lots=%d" % len(lots)) if lots else "STATUS: EMPTY")
     return 0
