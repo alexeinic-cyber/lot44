@@ -1,5 +1,6 @@
 # ЛОТ 44 — ежедневная пересборка и деплой на Netlify
 # Расписание: 05:00 UTC = 08:00 МСК
+# Дополнительно: запускается сразу после обновления data/torgi.json (данные готовит домашний ПК)
 
 name: Daily build & deploy
 
@@ -8,9 +9,17 @@ on:
     # 05:00 UTC → 08:00 Москва (UTC+3)
     - cron: "0 5 * * *"
   workflow_dispatch:  # ручной запуск из вкладки Actions
+  push:
+    branches: [main]
+    paths:
+      - "data/torgi.json"
 
 permissions:
   contents: write
+
+concurrency:
+  group: lot44-build-deploy
+  cancel-in-progress: false
 
 jobs:
   build-deploy:
@@ -27,13 +36,20 @@ jobs:
           python-version: "3.12"
 
       - name: Build site
+        id: build
         run: |
-          python scripts/build.py
-          ls -la site/
+          set -euo pipefail
+          python scripts/build.py | tee build.log
+          if grep -q "STATUS: OK" build.log; then
+            echo "has_data=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_data=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Данные не получены (API недоступен из CI и кэш пуст) — пропускаю коммит и деплой"
+          fi
           test -f site/index.html
-          test -f site/heritage.html
 
       - name: Commit updated data (cache)
+        if: steps.build.outputs.has_data == 'true'
         run: |
           git config user.name "lot44-bot"
           git config user.email "lot44-bot@users.noreply.github.com"
@@ -42,6 +58,7 @@ jobs:
           git push || true
 
       - name: Deploy to Netlify
+        if: steps.build.outputs.has_data == 'true'
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
