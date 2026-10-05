@@ -1,117 +1,71 @@
 # ЛОТ 44 — автосборка и деплой
 
-Ежедневное обновление витрины торгов + наследия Костромской области.
+Витрина имущественных торгов Костромской области — обновляется автоматически каждый день.
+Лоты, относящиеся к **объектам культурного наследия**, отмечены значком «ОКН».
 
-- **Торги** → `torgi.gov.ru` (API)
-- **Наследие** → `наследие.дом.рф` (API)
+- **Данные** → `torgi.gov.ru` (открытый API, регион 47)
 - **Хостинг** → Netlify
-- **Расписание** → GitHub Actions, каждый день **08:00 МСК**
+- **Сборка и деплой** → GitHub Actions
+- **Расписание** → ежедневно **08:00 МСК** + сборка сразу после обновления данных
 
 ---
 
-## Быстрый старт (15–20 минут)
+## Как это работает
 
-### 1. Создай репозиторий на GitHub
+1. **Домашний ПК** (в России — API доступны) забирает свежие данные и кладёт их в репозиторий:
+   `data/torgi.json`. Локальная автоматизация — в папке проекта `lot44/automation`.
+2. **GitHub Actions** замечает обновление `data/torgi.json` (push), пересобирает `site/index.html`,
+   коммитит результат и деплоит на Netlify. Обычно это занимает ~2 минуты.
+3. Если данные давно не обновлялись, Actions пересобирает сайт из последнего кэша — сайт не «пустеет».
+   Пустая сборка (нет ни свежих данных, ни кэша) **не коммитится и не деплоится**.
 
-1. github.com → **New repository**
-2. Имя: `lot44` (или любое)
-3. Public или Private — на твой выбор
-4. **Не** ставь галочки README/license (файлы уже есть)
+Почему данные забирает домашний ПК, а не сами Actions? Раннеры GitHub находятся в США/ЕС,
+и российские гос. API (`torgi.gov.ru`) из них недоступны — проверено, сборки выходили пустыми.
+Поэтому действует схема: **данные — с домашнего ПК, сборка и деплой — в облаке.**
 
-### 2. Залей этот проект
+## Расписание и запуски
 
-На своём компьютере:
+| Канал | Когда | Что делает |
+|-------|-------|------------|
+| `push` по `data/torgi.json` | сразу после обновления данных | основной канал, пересборка + деплой |
+| `schedule` | ежедневно 05:00 UTC (08:00 МСК) | резервный прогон из кэша |
+| `workflow_dispatch` | вручную (вкладка Actions) | «Run workflow» |
 
-```bash
-# скачай/распакуй папку lot44-auto, зайди в неё
-cd lot44-auto
-
-git init
-git add .
-git commit -m "init: LOT 44 auto build"
-git branch -M main
-git remote add origin https://github.com/ТВОЙ_ЛОГИН/lot44.git
-git push -u origin main
-```
-
-### 3. Подключи Netlify
-
-**Вариант A — через сайт (проще):**
-
-1. [app.netlify.com](https://app.netlify.com) → Add new site → Import from Git → GitHub → выбери `lot44`
-2. Build settings:
-   - Build command: *(оставь пустым или `echo ok`)*
-   - Publish directory: `site`
-3. Deploy. Получишь ссылку вида `https://xxx.netlify.app`
-
-**Вариант B — только токен (для Actions):**
-
-1. Netlify → User settings → Applications → Personal access tokens → New
-2. Скопируй токен
-3. Netlify → Site settings → General → Site details → **Site ID** (скопируй)
-
-### 4. Секреты для GitHub Actions
-
-В репозитории GitHub:
-
-**Settings → Secrets and variables → Actions → New repository secret**
+## Секреты (Settings → Secrets and variables → Actions)
 
 | Имя | Значение |
 |-----|----------|
 | `NETLIFY_AUTH_TOKEN` | Personal access token из Netlify |
-| `NETLIFY_SITE_ID` | Site ID сайта |
+| `NETLIFY_SITE_ID` | Site ID сайта (Netlify → Site configuration → Site information) |
 
-### 5. Проверь
+Секреты уже настроены. Если сайт на Netlify пересоздаётся — обновите `NETLIFY_SITE_ID`.
 
-1. GitHub → вкладка **Actions** → **Daily build & deploy** → **Run workflow**
-2. Дождись зелёной галочки
-3. Открой сайт — дата «Обновлено» должна быть сегодняшней
-
-Дальше Actions сам запускается каждый день в 08:00 МСК.
-
----
-
-## Локальный запуск
+## Локальная проверка
 
 ```bash
 python3 scripts/build.py
 # открой site/index.html в браузере
 ```
 
-При недоступности API используются файлы из `data/` (кэш).
-
----
+При недоступности API используется кэш из `data/`. Строка `STATUS: OK lots=N` — успешная сборка;
+`STATUS: EMPTY` — данных нет (в CI такая сборка пропускается).
 
 ## Структура
 
 ```
-lot44-auto/
-├── .github/workflows/daily-build.yml   # cron 08:00 МСК
-├── scripts/build.py                    # сборщик
-├── site/                               # готовый HTML (деплой)
-│   ├── index.html                      # торги
-│   └── heritage.html                   # наследие
-├── data/                               # кэш JSON
+lot44/
+├── .github/workflows/daily-build.yml   # сборка + деплой (08:00 МСК, push по данным)
+├── scripts/build.py                    # сборщик (одностраничная витрина + метки «ОКН»)
+├── site/index.html                     # готовый HTML (деплой целиком из папки site/)
+├── data/torgi.json                     # кэш данных (обновляет домашний ПК)
 ├── netlify.toml
 └── README.md
 ```
 
----
-
-## Если API torgi/наследие недоступны из GitHub
-
-Actions крутятся в США/ЕС — иногда гос. API режут. Тогда:
-
-1. Кэш в `data/` сохраняется после удачных сборок
-2. Можно запускать `build.py` у себя (Россия) по Windows Task Scheduler и пушить `site/` + `data/` в репо
-3. Netlify будет деплоить то, что в репозитории
-
----
-
 ## Связка с каналом ВК
 
-После успешной сборки можно добавить шаг: генерация «Лотов дня» в `automation/out/`.  
-Пока вручную: смотри свежие лоты на сайте → пост в vk.ru/lot44.
+Черновики «Лотов дня» и карточки готовятся в `lot44/automation/out` (локальная автоматизация)
+и публикуются в канал vk.ru/lot44 вручную.
 
 ---
 
