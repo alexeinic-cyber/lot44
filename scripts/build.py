@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
@@ -86,11 +87,12 @@ def save_cache(name: str, data: Any) -> None:
 
 # ---------- ТОРГИ ----------
 
-def fetch_torgi_lots() -> list[dict]:
+def fetch_torgi_lots():
     """Все активные лоты Костромской области с torgi.gov.ru.
 
-    Набор параметров проверен на живом API: другой вариант sort даёт HTTP 400,
-    сервер отдаёт не больше 10 записей на страницу — идём по страницам до totalElements.
+    Возвращает (lots, total|None). Набор параметров проверен на живом API:
+    другой вариант sort даёт HTTP 400; сервер отдаёт не больше 10 записей на
+    страницу — идём по страницам до totalElements. На каждый запрос — до 3 попыток.
     """
     lots: list[dict] = []
     page = 0
@@ -102,10 +104,16 @@ def fetch_torgi_lots() -> list[dict]:
                + "&matchPhrase=false&byFirstVersion=true"
                + "&size=10&page=%d" % page
                + "&sort=firstVersionPublicationDate,desc")
-        try:
-            data = http_get_json(url)
-        except (URLError, HTTPError, TimeoutError, json.JSONDecodeError) as e:
-            print(f"[torgi] API error page={page}: {e}", file=sys.stderr)
+        data = None
+        for attempt in range(1, 4):  # до 3 попыток на страницу
+            try:
+                data = http_get_json(url)
+                break
+            except (URLError, HTTPError, TimeoutError, json.JSONDecodeError) as e:
+                print(f"[torgi] API error page={page}, попытка {attempt}: {e}", file=sys.stderr)
+                time.sleep(1.5 * attempt)
+        if data is None:
+            print(f"[torgi] страница {page} недоступна — пагинация прервана", file=sys.stderr)
             break
 
         content = data.get("content") or []
@@ -118,9 +126,10 @@ def fetch_torgi_lots() -> list[dict]:
         page += 1
         if total is not None and len(lots) >= int(total):
             break
+        time.sleep(0.25)  # мягкий темп
 
     print(f"[torgi] fetched {len(lots)} lots")
-    return lots
+    return lots, total
 
 
 def normalize_torgi(raw: dict) -> dict:
@@ -472,19 +481,25 @@ def main() -> int:
 
     # --- торги ---
     lots = []
+    total = None
     try:
-        lots = fetch_torgi_lots()
-        if lots:
-            save_cache("torgi.json", lots)
+        lots, total = fetch_torgi_lots()
     except Exception as e:
         print(f"[torgi] fatal: {e}", file=sys.stderr)
-    if not lots:
+    complete = bool(lots) and (total is None or len(lots) >= int(total))
+    if complete:
+        save_cache("torgi.json", lots)
+    elif lots:
+        print("[torgi] сбор неполный (%s из %s) — кэш не трогаю" % (len(lots), total), file=sys.stderr)
+    if not complete:
         cached = load_cache("torgi.json")
-        if cached:
-            print("[torgi] using cache", len(cached))
+        if cached and (not lots or len(cached) > len(lots)):
+            print("[torgi] использую кэш", len(cached))
             lots = cached
-        else:
+        elif not lots:
             print("[torgi] no data", file=sys.stderr)
+        else:
+            print("[torgi] кэша нет — оставляю неполный набор", len(lots), file=sys.stderr)
 
     (SITE / "index.html").write_text(render_torgi(lots, updated), encoding="utf-8")
     print(f"[ok] site/index.html ({len(lots)} lots)")
