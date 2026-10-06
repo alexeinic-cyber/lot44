@@ -318,6 +318,7 @@ main{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
 .b.okn{background:var(--amber);color:var(--navy)}
 .b.new{background:#d1fae5;color:#047857}
 .lot .photo{width:100%;height:170px;object-fit:cover;border-radius:10px;display:block;background:#eef1f6}
+.lot.over{opacity:.72}
 .timer{color:var(--muted)}
 .timer.urgent{color:#b45309;font-weight:700}
 .timer.crit{color:#dc2626;font-weight:800}
@@ -503,30 +504,41 @@ def render_torgi(lots: list[dict], updated: str) -> str:
     </div>
   </div>'''
 
-    # sort: urgent first, then by deadline
+    # сортировка: активные — по близости дедлайна; без даты — в конце; завершённые — последними
+    now = now_msk()
+
     def sort_key(L):
-        d = L["days_left"]
-        if d is None:
-            return (1, 9999)
-        return (0 if d <= 3 else 1, d)
+        dt = parse_dt(L.get("deadline_raw") or "")
+        if dt is None:
+            return (2, 0.0, L["name"])
+        if dt < now:
+            return (3, -dt.timestamp(), L["name"])
+        return (0, dt.timestamp(), L["name"])
 
     lots_sorted = sorted(lots, key=sort_key)
 
     cards = []
     for L in lots_sorted:
+        dt = parse_dt(L.get("deadline_raw") or "")
+        over = bool(dt and dt < now)
         d = L["days_left"]
-        t_cls = "timer"
-        if d is not None and d <= 0:
-            t_cls += " over"
-            static = "приём завершён"
-        elif d is not None and d <= 1:
-            t_cls += " crit"
-            static = f'осталось {d} дн.'
-        elif d is not None and d <= 3:
-            t_cls += " urgent"
-            static = f'осталось {d} дн.'
+        if over:
+            t_cls = "timer over"
+            static = "приём заявок завершён"
+        elif dt is not None:
+            hours_left = (dt - now).total_seconds() / 3600.0
+            if hours_left <= 24:
+                t_cls = "timer crit"
+                static = "осталось меньше суток"
+            elif d is not None and d <= 3:
+                t_cls = "timer urgent"
+                static = f'осталось {d} дн.'
+            else:
+                t_cls = "timer"
+                static = f'осталось {d} дн.' if d is not None else ""
         else:
-            static = f'осталось {d} дн.' if d is not None else ""
+            t_cls = "timer"
+            static = ""
         dl = L.get("deadline_raw") or ""
         timer = (f'<span class="{t_cls}" data-deadline="{esc(dl)}">{static}</span>'
                  if dl else f'<span class="{t_cls}">{static}</span>')
@@ -537,7 +549,7 @@ def render_torgi(lots: list[dict], updated: str) -> str:
         price_attr = f'{L["price_num"]:.0f}' if L.get("price_num") is not None else ''
         search = f"{L['name']} {L['snip']} {L['nn']} {L['notice']}" + (" ОКН" if L.get("okn") else "")
         cards.append(f'''
-<article class="lot" data-card data-cat="{L['deal']}" data-price="{price_attr}" data-search="{esc(search)}">
+<article class="{('lot over' if over else 'lot')}" data-card data-cat="{L['deal']}" data-price="{price_attr}" data-search="{esc(search)}">
   {photo}
   <div class="badges">
     {new_span}{okn_span}<span class="b deal-{L['deal']}">{esc(L['deal'])}</span>
