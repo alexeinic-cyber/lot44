@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-ЛОТ 44 — сборщик витрины торгов Костромской области (одностраничная версия).
+ЛОТ 44 — сборщик витрины торгов Костромской области (витрина + аналитический дашборд).
 Запуск: python scripts/build.py
-Выход:  site/index.html  (данные: torgi.gov.ru)
+Выход:  site/index.html, site/analytics.html  (данные: torgi.gov.ru)
 Возможности витрины: фото лотов, живые таймеры приёма заявок, фильтр по цене,
 метки «ОКН» (объекты культурного наследия) и «новый» (свежие публикации).
 """
@@ -12,6 +12,7 @@ import json
 import re
 import sys
 import time
+from collections import Counter
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
@@ -54,6 +55,9 @@ UA = (
 
 # «объект культурного наследия» / «объекты культурного наследия …»
 OKN_RE = re.compile(r"объект[а-яё]*\s+культурн[а-яё]*\s+наследи[а-яё]*", re.IGNORECASE)
+
+# API платформы «Наследие» ДОМ.РФ (для аналитики)
+OKN_API = "https://xn--80aicbopm7a.xn--d1aqf.xn--p1ai/okn/api/portal/objects"
 
 
 def now_msk() -> datetime:
@@ -276,6 +280,94 @@ def format_deadline(s: Any) -> tuple[str, int | None]:
         return f"до {d}.{mo}.{y}, {hh}:{mm} МСК", None
 
 
+def fmt_money(v: float) -> str:
+    if not v:
+        return "—"
+    if v >= 1_000_000_000:
+        s = "%.1f млрд ₽" % (v / 1_000_000_000)
+    elif v >= 1_000_000:
+        s = "%.1f млн ₽" % (v / 1_000_000)
+    elif v >= 1_000:
+        s = "%.0f тыс. ₽" % (v / 1_000)
+    else:
+        s = "%.0f ₽" % v
+    return s.replace(".", ",")
+
+
+_GEO_PATTERNS = [
+    (re.compile(r"г\.\s*([А-ЯЁ][а-яё\-]+)"), "г."),
+    (re.compile(r"город\s+([А-ЯЁ][а-яё\-]+)"), "г."),
+    (re.compile(r"пгт\.?\s*([А-ЯЁ][а-яё\-]+)"), "пгт"),
+    (re.compile(r"пос\.\s*([А-ЯЁ][а-яё\-]+)"), "п."),
+    (re.compile(r"п\.\s*([А-ЯЁ][а-яё\-]+)"), "п."),
+    (re.compile(r"с\.\s*([А-ЯЁ][а-яё\-]+)"), "с."),
+    (re.compile(r"м\.о\.\s*([А-ЯЁ][а-яё\-]+)"), "mo"),
+    (re.compile(r"([А-ЯЁ][а-яё\-]+)\s+(?:муниципальн[а-яё]*\s+)?район"), "rn"),
+    (re.compile(r"([А-ЯЁ][а-яё\-]+)\s+р-н"), "rn"),
+]
+
+
+def extract_location(text: str) -> str:
+    """Оценочно вытаскивает населённый пункт/район из текста адреса."""
+    t = text or ""
+    for rx, kind in _GEO_PATTERNS:
+        m = rx.search(t)
+        if not m:
+            continue
+        name = m.group(1)
+        if kind == "mo":
+            return name
+        if kind == "rn":
+            return name + " р-н"
+        return kind + " " + name
+    return ""
+
+
+def map_okn_status(s: str) -> str:
+    return {
+        "AUCTION": "Конкурс объявлен",
+        "READY": "Подготовка к торгам",
+        "INVESTOR_FOUND": "Инвестор найден",
+        "NO_SOLUTION": "Решение отсутствует",
+        "RESTORED": "Восстановлен",
+    }.get(s, s or "—")
+
+
+def fetch_heritage_stats() -> list[dict]:
+    """Лёгкий сбор объектов «Наследие» — только для статистики дашборда."""
+    objs: list[dict] = []
+    offset = 0
+    limit = 100
+    while offset < 600:
+        url = OKN_API + "?region=44&offset=%d&limit=%d" % (offset, limit)
+        data = None
+        for attempt in range(1, 4):
+            try:
+                data = http_get_json(url)
+                break
+            except Exception as e:
+                print(f"[okn] API error offset={offset}, попытка {attempt}: {e}", file=sys.stderr)
+                time.sleep(1.5 * attempt)
+        if data is None:
+            break
+        items = data.get("payload") or data.get("content") or []
+        if not items:
+            break
+        for it in items:
+            objs.append({
+                "id": str(it.get("externalId") or ""),
+                "name": str(it.get("name") or "")[:140],
+                "status": map_okn_status(str(it.get("status") or "")),
+            })
+        total = (data.get("pageInfo") or {}).get("totalSize")
+        offset += limit
+        if total and offset >= int(total):
+            break
+        time.sleep(0.3)
+    print(f"[okn] fetched {len(objs)} objects")
+    return objs
+
+
 # ---------- HTML ----------
 
 CSS = """
@@ -348,7 +440,47 @@ footer{background:var(--navy);color:#9fb0d0;padding:28px 22px;margin-top:40px;fo
 footer a{color:#FCA311;font-weight:700}
 footer .brand{color:#fff;font-weight:800;margin-bottom:8px;font-size:16px}
 footer .brand span{color:var(--amber)}
-@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}.pslide{flex:1 1 100%;min-width:0}}
+.tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tab{display:inline-block;padding:7px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
+     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#eaf1ff;text-decoration:none}
+.tab.on{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+.dash{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi-v{font-size:23px;font-weight:800;color:var(--navy);line-height:1.15}
+.kpi-t{font-size:12.5px;color:var(--muted);margin-top:4px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.dash-grid .wide{grid-column:1/-1}
+.dash-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+           display:flex;flex-direction:column;gap:10px}
+.dash-title{font-weight:800;font-size:15.5px;color:var(--ink)}
+.dash-sub{color:var(--muted);font-size:12.5px;margin-top:-6px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;font-size:13px}
+.bar-label{color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{background:#eef1f6;border-radius:6px;height:16px;overflow:hidden}
+.bar-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#FCA311,#ffc766)}
+.bar-fill.bluefill{background:linear-gradient(90deg,#1d4ed8,#6d9bf1)}
+.bar-fill.greenfill{background:linear-gradient(90deg,#047857,#4bc09a)}
+.bar-val{text-align:right;font-weight:700;color:var(--ink)}
+.stack{display:flex;height:22px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.seg{display:block;height:100%}
+.seg-sale{background:#047857}.seg-rent{background:#1d4ed8}.seg-other{background:#9ca3af}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:#374151}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.legend .li-sale{background:#047857}.legend .li-rent{background:#1d4ed8}.legend .li-other{background:#9ca3af}
+.tlist{display:flex;flex-direction:column;gap:2px}
+a.trow{display:flex;gap:10px;align-items:baseline;font-size:13.5px;color:inherit;text-decoration:none;
+       padding:7px 6px;border-bottom:1px dashed var(--line);border-radius:8px}
+a.trow:last-child{border-bottom:none}
+a.trow:hover{background:#f6f8fd}
+.trow .num{color:var(--muted);min-width:22px;font-weight:700}
+.trow .nm{flex:1;overflow:hidden}
+.trow .pr{font-weight:800;white-space:nowrap;color:var(--navy)}
+.trow .dl{color:var(--muted);white-space:nowrap;font-size:12.5px}
+.hint{font-size:12.5px;color:var(--muted)}
+@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}.pslide{flex:1 1 100%;min-width:0}
+  .bar-row{grid-template-columns:104px 1fr 44px}.dash-grid{grid-template-columns:1fr}}
 """
 
 JS_FILTER = """
@@ -592,6 +724,10 @@ def render_torgi(lots: list[dict], updated: str) -> str:
     <p>Продажа и аренда государственного и муниципального имущества, публичные предложения — одним списком.
        Данные: портал торгов <strong>torgi.gov.ru</strong>. Лоты-объекты культурного наследия отмечены значком <strong>ОКН</strong>,
        свежие публикации — меткой <strong>новый</strong>.</p>
+    <div class="tabs">
+      <span class="tab on">Торги</span>
+      <a class="tab" href="analytics.html">Аналитика</a>
+    </div>
     <div class="meta">Обновлено: {esc(updated)} · активных лотов: {len(lots)}
       (Аренда: {counts.get('Аренда',0)} · Другое: {counts.get('Другое',0)} · Продажа: {counts.get('Продажа',0)}){okn_meta}{new_meta}
       · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
@@ -609,6 +745,227 @@ def render_torgi(lots: list[dict], updated: str) -> str:
 </main>
 {footer_html()}
 {JS_FILTER}
+</body>
+</html>
+"""
+
+
+def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
+    refresh_days(lots)
+    now = now_msk()
+
+    def dtime(L):
+        return parse_dt(L.get("deadline_raw") or "")
+
+    active = []
+    for L in lots:
+        dt = dtime(L)
+        if dt is not None and dt < now:
+            continue
+        active.append(L)
+
+    # 1. структура по типу сделки
+    deal_order = ["Продажа", "Аренда", "Другое"]
+    deal_counts = Counter(L["deal"] for L in lots)
+    tot = max(1, sum(deal_counts.get(k, 0) for k in deal_order))
+    seg_cls = {"Продажа": "seg-sale", "Аренда": "seg-rent", "Другое": "seg-other"}
+    li_cls = {"Продажа": "li-sale", "Аренда": "li-rent", "Другое": "li-other"}
+    segs_html = "".join(
+        '<span class="seg %s" style="width:%.2f%%" title="%s: %d"></span>' % (
+            seg_cls[k], deal_counts.get(k, 0) / tot * 100, k, deal_counts.get(k, 0))
+        for k in deal_order
+    )
+    legend = "".join(
+        '<span><i class="%s"></i>%s — <b>%d</b></span>' % (li_cls[k], k, deal_counts.get(k, 0))
+        for k in deal_order
+    )
+
+    # 2. ОКН
+    okn_status_order = ["Конкурс объявлен", "Подготовка к торгам", "Инвестор найден",
+                        "Решение отсутствует", "Восстановлен"]
+    okn_counts = Counter(o.get("status", "—") for o in objs)
+    okn_lots = sum(1 for L in lots if L.get("okn"))
+
+    # 3. география
+    geo = Counter()
+    for L in active:
+        loc = extract_location((L.get("name") or "") + " " + (L.get("snip") or ""))
+        if loc:
+            geo[loc] += 1
+    top_geo = geo.most_common(10)
+
+    # 4. формы
+    forms = Counter(re.sub(r"\s+", " ", L.get("form") or "—") for L in active)
+    top_forms = forms.most_common(6)
+
+    # 5. срочность
+    b = [0, 0, 0, 0, 0, 0]
+    for L in active:
+        dt = dtime(L)
+        if dt is None:
+            b[5] += 1
+            continue
+        days = (dt - now).total_seconds() / 86400.0
+        if days <= 3:
+            b[0] += 1
+        elif days <= 7:
+            b[1] += 1
+        elif days <= 14:
+            b[2] += 1
+        elif days <= 30:
+            b[3] += 1
+        else:
+            b[4] += 1
+    urgen = list(zip(["до 3 дней", "4–7 дней", "8–14 дней", "15–30 дней", "больше 30 дней", "без срока"], b))
+
+    # 6. ценовые сегменты
+    seg_defs = [("до 100 тыс. ₽", 0, 100_000), ("100–500 тыс. ₽", 100_000, 500_000),
+                ("0,5–1 млн ₽", 500_000, 1_000_000), ("1–5 млн ₽", 1_000_000, 5_000_000),
+                ("5–10 млн ₽", 5_000_000, 10_000_000), ("от 10 млн ₽", 10_000_000, None)]
+    segs = [0] * 6
+    no_price = 0
+    for L in active:
+        p = L.get("price_num")
+        if p is None:
+            no_price += 1
+            continue
+        for i, (_, lo, hi) in enumerate(seg_defs):
+            if (hi is None and p >= lo) or (hi is not None and lo <= p < hi):
+                segs[i] += 1
+                break
+    price_items = [(seg_defs[i][0], segs[i]) for i in range(6)] + [("без указанной цены", no_price)]
+
+    # 7. топ-10 дорогих
+    rich = sorted((L for L in lots if L.get("price_num")), key=lambda x: -x["price_num"])[:10]
+    rich_rows = "".join(
+        '<a class="trow" href="%s" target="_blank" rel="noopener"><span class="num">%d</span>'
+        '<span class="nm">%s</span><span class="pr">%s</span><span class="dl">%s</span></a>'
+        % (esc(L.get("link") or ""), i + 1, esc(L.get("name") or ""), esc(L.get("price") or ""),
+           esc(L.get("deadline") or ""))
+        for i, L in enumerate(rich)
+    )
+
+    # 8. срочные ≤ 3 дней
+    urg_list = []
+    for L in active:
+        dt = dtime(L)
+        if dt is not None and (dt - now).total_seconds() <= 3 * 86400:
+            urg_list.append(L)
+    urg_list.sort(key=lambda x: dtime(x))
+    urg_list = urg_list[:12]
+    urg_rows = "".join(
+        '<a class="trow" href="%s" target="_blank" rel="noopener"><span class="nm">%s</span>'
+        '<span class="pr">%s</span><span class="dl">%s</span></a>'
+        % (esc(L.get("link") or ""), esc(L.get("name") or ""), esc(L.get("price") or ""),
+           esc(L.get("deadline") or ""))
+        for L in urg_list
+    )
+
+    # KPI
+    total_sum = sum(L["price_num"] for L in active if L.get("price_num"))
+    kpis = [
+        ("Активных лотов", "%d" % len(active)),
+        ("Суммарная начальная цена", fmt_money(total_sum)),
+        ("Срочных (до 3 дней)", "%d" % urgen[0][1]),
+        ("Лотов с меткой «ОКН»", "%d" % okn_lots),
+        ("Объектов на «Наследии»", ("%d" % len(objs)) if objs else "—"),
+    ]
+    kpi_html = "".join(
+        '<div class="kpi"><div class="kpi-v">%s</div><div class="kpi-t">%s</div></div>' % (v, esc(t))
+        for t, v in kpis
+    )
+
+    def bars(items, fill=""):
+        mx = max([v for _, v in items] + [1])
+        rows = []
+        for label, val in items:
+            w = 0 if not val else max(4, round(val / mx * 100))
+            rows.append(
+                '<div class="bar-row"><span class="bar-label" title="%s">%s</span>'
+                '<span class="bar-track"><span class="bar-fill %s" style="width:%d%%"></span></span>'
+                '<span class="bar-val">%d</span></div>' % (esc(label), esc(label), fill, w, val))
+        return '<div class="bars">' + "".join(rows) + "</div>"
+
+    okn_block = (bars([(s, okn_counts.get(s, 0)) for s in okn_status_order], "greenfill")
+                 if objs else '<div class="hint">Данные об объектах «Наследия» сейчас недоступны — обновим при следующей сборке.</div>')
+    geo_block = bars(top_geo, "bluefill") if top_geo else '<div class="hint">Не удалось определить локации.</div>'
+    forms_block = bars(top_forms, "bluefill")
+    urgen_block = bars(urgen)
+    price_block = bars(price_items)
+
+    return f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аналитика торгов Костромской области | ЛОТ 44</title>
+<meta name="description" content="Аналитический дашборд по торгам Костромской области: структура рынка, география, сроки, ценовые сегменты, наследие.">
+<style>{CSS}</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
+      <span style="color:#9fb0d0;font-size:14px">аналитика</span></div>
+    <h1>Аналитика торгов Костромской области</h1>
+    <p>Сводная картина по активным лотам: структура рынка, география, сроки, ценовые сегменты
+       и объекты культурного наследия. Данные: портал торгов <strong>torgi.gov.ru</strong>.</p>
+    <div class="tabs">
+      <a class="tab" href="index.html">Торги</a>
+      <span class="tab on">Аналитика</span>
+    </div>
+    <div class="meta">Обновлено: {esc(updated)} · активных лотов: {len(active)} · объектов «Наследия»: {len(objs) if objs else "—"}
+      · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
+  </div>
+</header>
+<main class="dash">
+  <div class="kpis">{kpi_html}</div>
+  <div class="dash-grid">
+    <section class="dash-card">
+      <div class="dash-title">Структура рынка по типу сделки</div>
+      <div class="dash-sub">Распределение активных лотов: продажа / аренда / прочее</div>
+      <div class="stack">{segs_html}</div>
+      <div class="legend">{legend}</div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Объекты культурного наследия</div>
+      <div class="dash-sub">Статусы объектов на платформе «Наследие» ДОМ.РФ</div>
+      {okn_block}
+      <div class="hint">Плюс лоты с меткой «ОКН» на витрине: {okn_lots}</div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">География лотов — топ-10</div>
+      <div class="dash-sub">Локации активных лотов (по адресам из описаний, оценочно)</div>
+      {geo_block}
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Формы проведения торгов — топ-6</div>
+      <div class="dash-sub">Аукцион, публичное предложение, конкурс и другие</div>
+      {forms_block}
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Срочность: дедлайны заявок</div>
+      <div class="dash-sub">Сколько лотов закрывается в ближайшие периоды</div>
+      {urgen_block}
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Ценовые сегменты</div>
+      <div class="dash-sub">Распределение активных лотов по начальной цене</div>
+      {price_block}
+    </section>
+    <section class="dash-card wide">
+      <div class="dash-title">Топ-10 самых дорогих лотов</div>
+      <div class="dash-sub">Крупнейшие предложения по начальной цене</div>
+      <div class="tlist">{rich_rows or '<div class="hint">Нет данных о ценах.</div>'}</div>
+    </section>
+    <section class="dash-card wide">
+      <div class="dash-title">⚡ Срочные лоты: заявки закрываются ≤ 3 дней</div>
+      <div class="dash-sub">Успейте изучить документацию и подать заявку</div>
+      <div class="tlist">{urg_rows or '<div class="hint">Срочных лотов сейчас нет.</div>'}</div>
+    </section>
+  </div>
+</main>
+{footer_html()}
 </body>
 </html>
 """
@@ -670,10 +1027,26 @@ def main() -> int:
         else:
             print("[torgi] кэша нет — оставляю неполный набор", len(lots), file=sys.stderr)
 
+    # --- наследие (для аналитики) ---
+    objs = []
+    try:
+        objs = fetch_heritage_stats()
+        if objs:
+            save_cache("heritage.json", objs)
+    except Exception as e:
+        print(f"[okn] fatal: {e}", file=sys.stderr)
+    if not objs:
+        cached = load_cache("heritage.json")
+        if cached:
+            print("[okn] использую кэш", len(cached))
+            objs = cached
+
     (SITE / "index.html").write_text(render_torgi(lots, updated), encoding="utf-8")
+    (SITE / "analytics.html").write_text(render_analytics(lots, objs, updated), encoding="utf-8")
     n_photos = sum(1 for L in lots if L.get("img"))
     n_new = sum(1 for L in lots if L.get("is_new"))
     print(f"[ok] site/index.html ({len(lots)} lots, {n_photos} with photo, {n_new} new)")
+    print(f"[ok] site/analytics.html ({len(objs)} okn objects, {len(lots)} lots)")
     print(f"[ok] updated {updated}")
     print(("STATUS: OK lots=%d" % len(lots)) if lots else "STATUS: EMPTY")
     return 0
