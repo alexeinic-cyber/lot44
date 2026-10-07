@@ -75,7 +75,47 @@ footer{background:var(--navy);color:#9fb0d0;padding:28px 22px;margin-top:40px;fo
 footer a{color:#FCA311;font-weight:700}
 footer .brand{color:#fff;font-weight:800;margin-bottom:8px;font-size:16px}
 footer .brand span{color:var(--amber)}
-@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}.pslide{flex:1 1 100%;min-width:0}}
+.tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tab{display:inline-block;padding:7px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
+     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#eaf1ff;text-decoration:none}
+.tab.on{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+.dash{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi-v{font-size:23px;font-weight:800;color:var(--navy);line-height:1.15}
+.kpi-t{font-size:12.5px;color:var(--muted);margin-top:4px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.dash-grid .wide{grid-column:1/-1}
+.dash-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+           display:flex;flex-direction:column;gap:10px}
+.dash-title{font-weight:800;font-size:15.5px;color:var(--ink)}
+.dash-sub{color:var(--muted);font-size:12.5px;margin-top:-6px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;font-size:13px}
+.bar-label{color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{background:#eef1f6;border-radius:6px;height:16px;overflow:hidden}
+.bar-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#FCA311,#ffc766)}
+.bar-fill.bluefill{background:linear-gradient(90deg,#1d4ed8,#6d9bf1)}
+.bar-fill.greenfill{background:linear-gradient(90deg,#047857,#4bc09a)}
+.bar-val{text-align:right;font-weight:700;color:var(--ink)}
+.stack{display:flex;height:22px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.seg{display:block;height:100%}
+.seg-sale{background:#047857}.seg-rent{background:#1d4ed8}.seg-other{background:#9ca3af}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:#374151}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.legend .li-sale{background:#047857}.legend .li-rent{background:#1d4ed8}.legend .li-other{background:#9ca3af}
+.tlist{display:flex;flex-direction:column;gap:2px}
+a.trow{display:flex;gap:10px;align-items:baseline;font-size:13.5px;color:inherit;text-decoration:none;
+       padding:7px 6px;border-bottom:1px dashed var(--line);border-radius:8px}
+a.trow:last-child{border-bottom:none}
+a.trow:hover{background:#f6f8fd}
+.trow .num{color:var(--muted);min-width:22px;font-weight:700}
+.trow .nm{flex:1;overflow:hidden}
+.trow .pr{font-weight:800;white-space:nowrap;color:var(--navy)}
+.trow .dl{color:var(--muted);white-space:nowrap;font-size:12.5px}
+.hint{font-size:12.5px;color:var(--muted)}
+@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}.pslide{flex:1 1 100%;min-width:0}
+  .bar-row{grid-template-columns:104px 1fr 44px}.dash-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -87,8 +127,12 @@ footer .brand span{color:var(--amber)}
     <p>Продажа и аренда государственного и муниципального имущества, публичные предложения — одним списком.
        Данные: портал торгов <strong>torgi.gov.ru</strong>. Лоты-объекты культурного наследия отмечены значком <strong>ОКН</strong>,
        свежие публикации — меткой <strong>новый</strong>.</p>
-    <div class="meta">Обновлено: 07.10.2026, 20:52 МСК · активных лотов: 320
-      (Аренда: 152 · Другое: 104 · Продажа: 64) · ОКН: 6 · новых: 38
+    <div class="tabs">
+      <span class="tab on">Торги</span>
+      <a class="tab" href="analytics.html">Аналитика</a>
+    </div>
+    <div class="meta">Обновлено: 07.10.2026, 20:55 МСК · активных лотов: 324
+      (Аренда: 154 · Другое: 103 · Продажа: 67) · ОКН: 6 · новых: 49
       · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
   </div>
 </header>
@@ -102,7 +146,7 @@ footer .brand span{color:var(--amber)}
       <input type="range" id="pmax" aria-label="Максимальная цена" min="0" max="37280000" step="10000" value="37280000">
     </div>
   </div>
-  <span class="count" id="count">Показано: 320 из 320</span>
+  <span class="count" id="count">Показано: 324 из 324</span>
 </div>
 <main>
   <div class="grid">
@@ -2732,6 +2776,51 @@ footer .brand span{color:var(--amber)}
     <span class="nn">№ 21000012860000000566 · лот 1</span>
   </div>
 </article>
+<article class="lot" data-card data-cat="Аренда" data-price="1908000" data-search="Продажа земельного участка, расположенного по адресу: город Кострома, проезд Лазурный, земельный участок 2 Продажа земельного участка, расположенного по адресу: город Кострома, проезд Лазурный, земельный участок 2 № 21000012860000000568 · лот 3 21000012860000000568">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac4fa9daaef1b53b65b244c" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Продажа земельного участка, расположенного по адресу: город Кострома, проезд Лазурный, земельный участок 2</h3>
+  <p class="snip">Продажа земельного участка, расположенного по адресу: город Кострома, проезд Лазурный, земельный участок 2</p>
+  <div><span class="price">1 908 000 ₽</span></div>
+  <div class="meta2"><span class="end">до 23.10.2026, 15:00 МСК</span><span class="timer" data-deadline="2026-10-23T15:00:00.000+00:00">осталось 16 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000012860000000568_3" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 21000012860000000568 · лот 3</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Аренда" data-price="2238000" data-search="Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 10 Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 10 № 21000012860000000568 · лот 2 21000012860000000568">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac4fa65f72e2454efc94a82" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 10</h3>
+  <p class="snip">Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 10</p>
+  <div><span class="price">2 238 000 ₽</span></div>
+  <div class="meta2"><span class="end">до 23.10.2026, 15:00 МСК</span><span class="timer" data-deadline="2026-10-23T15:00:00.000+00:00">осталось 16 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000012860000000568_2" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 21000012860000000568 · лот 2</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Аренда" data-price="1547000" data-search="Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 6 Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 6 № 21000012860000000568 · лот 1 21000012860000000568">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac4fa0ff72e2454efc94a4e" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 6</h3>
+  <p class="snip">Продажа земельного участка, расположенного по адресу: город Кострома, улица Прибрежная, земельный участок 6</p>
+  <div><span class="price">1 547 000 ₽</span></div>
+  <div class="meta2"><span class="end">до 23.10.2026, 15:00 МСК</span><span class="timer" data-deadline="2026-10-23T15:00:00.000+00:00">осталось 16 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000012860000000568_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 21000012860000000568 · лот 1</span>
+  </div>
+</article>
 <article class="lot" data-card data-cat="Другое" data-price="11283" data-search="Скутер SYMJILY50, 2013 г.в., г/н отсутствует, VIN LXMAD12W1DXO44240 (Реализация по прямому назначению). Цвет красный, черный, наличие царапин и потёртостей по всему лакокрасочному покрытию кузова, обшивка седла имеет царапины и потертости, б/у, документы отсутствуют, имеется ключи зажигания. Имущество п № 21000004310000003256 · лот 1 21000004310000003256">
   <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6aaa3d446753ef0c024ce24c" alt="">
   <div class="badges">
@@ -3060,6 +3149,36 @@ footer .brand span{color:var(--amber)}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/22000063370000000080_1" target="_blank" rel="noopener">Портал торгов ↗</a>
     <span class="nn">№ 22000063370000000080 · лот 1</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Аренда" data-price="6686" data-search="Земельный участок с кадастровым номером 44:08:040809:203 Земельный участок с кадастровым номером 44:08:040809:203 площадь 740 по адресу Российская Федерация, Костромская область, муниципальный округ Красносельский, село Подольское, улица Волжская, земельный № 24000017360000000534 · лот 1 24000017360000000534">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac63150f72e2454efca2c69" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Земельный участок с кадастровым номером 44:08:040809:203</h3>
+  <p class="snip">Земельный участок с кадастровым номером 44:08:040809:203 площадь 740 по адресу Российская Федерация, Костромская область, муниципальный округ Красносельский, село Подольское, улица Волжская, земельный</p>
+  <div><span class="price">6 686 ₽</span></div>
+  <div class="meta2"><span class="end">до 26.10.2026, 09:00 МСК</span><span class="timer" data-deadline="2026-10-26T09:00:00.000+00:00">осталось 19 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/24000017360000000534_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 24000017360000000534 · лот 1</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Аренда" data-price="782400" data-search="Земельный участок с кадастровым номером 44:08:090408:193 Земельный участок с кадастровым номером 44:08:090408:193 площадь 1200 по адресу Российская Федерация, Костромская область, м.о. Красносельский, пгт. Красное-на-Волге, ул. Волжская, з/у 50 № 24000017360000000535 · лот 1 24000017360000000535">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac634c9f72e2454efca308e" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Земельный участок с кадастровым номером 44:08:090408:193</h3>
+  <p class="snip">Земельный участок с кадастровым номером 44:08:090408:193 площадь 1200 по адресу Российская Федерация, Костромская область, м.о. Красносельский, пгт. Красное-на-Волге, ул. Волжская, з/у 50</p>
+  <div><span class="price">782 400 ₽</span></div>
+  <div class="meta2"><span class="end">до 26.10.2026, 09:00 МСК</span><span class="timer" data-deadline="2026-10-26T09:00:00.000+00:00">осталось 19 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/24000017360000000535_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 24000017360000000535 · лот 1</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Аренда" data-price="" data-search="Извещение о возможности предварительного согласования предоставления в собственность за плату земельного участка с кадастровым номером 44:12:120143:ЗУ1 площадью 1064,0 кв.м, местоп Извещение о возможности предварительного согласования предоставления в собственность за плату земельного участка с кадастровым номером 44:12:120143:ЗУ1 площадью 1064,0 кв.м, местоположение: Костромска № 22000067750000000083 · лот 1 22000067750000000083">
@@ -3405,6 +3524,36 @@ footer .brand span{color:var(--amber)}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003311_1" target="_blank" rel="noopener">Портал торгов ↗</a>
     <span class="nn">№ 21000004310000003311 · лот 1</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Аренда" data-price="83266" data-search="нежилое здание – Гостиный двор № 5 общей площадью 492,7 кв. метров с кадастровым номером 44:26:021604:113 (реестровый номер П124400339У), расположенное по адресу: Костромская облас Техническое состояние имущества, а также перечень работ, необходимых для сохранения и использования объекта, установлены в акте технического состояния, являющемся приложением к договору аренды недвижи № 22000031260000000102 · лот 1 22000031260000000102">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac6239daaef1b53b65bfa1e" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>нежилое здание – Гостиный двор № 5 общей площадью 492,7 кв. метров с кадастровым номером 44:26:021604:113 (реестровый номер П124400339У), расположенное по адресу: Костромская облас</h3>
+  <p class="snip">Техническое состояние имущества, а также перечень работ, необходимых для сохранения и использования объекта, установлены в акте технического состояния, являющемся приложением к договору аренды недвижи</p>
+  <div><span class="price">83 266 ₽</span></div>
+  <div class="meta2"><span class="end">до 26.10.2026, 15:00 МСК</span><span class="timer" data-deadline="2026-10-26T15:00:00.000+00:00">осталось 19 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/22000031260000000102_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 22000031260000000102 · лот 1</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Аренда" data-price="65319" data-search="нежилое здание – Торговые ряды общей площадью 386,5 кв. метров с кадастровым номером 44:26:021604:114 (реестровый номер П124400342У), расположенное по адресу: Костромская область,  Общее состояние конструктивных элементов в целом работоспособное, архитектурных и декоративных элементов - удовлетворительное. Техническое состояние имущества, а также перечень работ, необходимых для  № 22000031260000000102 · лот 2 22000031260000000102">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac6269df72e2454efca1acf" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>нежилое здание – Торговые ряды общей площадью 386,5 кв. метров с кадастровым номером 44:26:021604:114 (реестровый номер П124400342У), расположенное по адресу: Костромская область, </h3>
+  <p class="snip">Общее состояние конструктивных элементов в целом работоспособное, архитектурных и декоративных элементов - удовлетворительное. Техническое состояние имущества, а также перечень работ, необходимых для </p>
+  <div><span class="price">65 319 ₽</span></div>
+  <div class="meta2"><span class="end">до 26.10.2026, 15:00 МСК</span><span class="timer" data-deadline="2026-10-26T15:00:00.000+00:00">осталось 19 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/22000031260000000102_2" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 22000031260000000102 · лот 2</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Продажа" data-price="22295" data-search="Продажа  металлолома Цветной лом и черный лом № 26000018280000000001 · лот 1 26000018280000000001">
@@ -4097,6 +4246,51 @@ footer .brand span{color:var(--amber)}
     <span class="nn">№ 21000024540000000108 · лот 1</span>
   </div>
 </article>
+<article class="lot" data-card data-cat="Продажа" data-price="408197" data-search="Здание котельной товарной станции, расположенное по адресу: Костромская область, Шарьинский район, город Шарья, ул. Октябрьская, д. 2 Здание с кадастровым номером 44:31:020707:81 площадь 57.6 по адресу Костромская область, р-н. Шарьинский, г. Шарья, ул. Октябрьская, д. 2 № 21000024540000000111 · лот 1 21000024540000000111">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac65b4ef72e2454efca67d2" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Продажа">Продажа</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Здание котельной товарной станции, расположенное по адресу: Костромская область, Шарьинский район, город Шарья, ул. Октябрьская, д. 2</h3>
+  <p class="snip">Здание с кадастровым номером 44:31:020707:81 площадь 57.6 по адресу Костромская область, р-н. Шарьинский, г. Шарья, ул. Октябрьская, д. 2</p>
+  <div><span class="price">408 197 ₽</span></div>
+  <div class="meta2"><span class="end">до 02.11.2026, 14:00 МСК</span><span class="timer" data-deadline="2026-11-02T14:00:00.000+00:00">осталось 26 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000024540000000111_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 21000024540000000111 · лот 1</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Продажа" data-price="140073" data-search="Здание с одновременным отчуждением земельного участка, расположенное по адресу: Костромская область, Шарьинский район, город Шарья, пос. Ветлужский, ул. Пролетарская, д. 59 Здание с кадастровым номером 44:31:010316:68 площадь 141.1 по адресу Российская Федерация, Костромская область, г.о. город Шарья, пгт. Ветлужский, ул. Пролетарская, зд. 59а № 21000024540000000112 · лот 1 21000024540000000112">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac65ee6f0ae127e1970c711" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Продажа">Продажа</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Здание с одновременным отчуждением земельного участка, расположенное по адресу: Костромская область, Шарьинский район, город Шарья, пос. Ветлужский, ул. Пролетарская, д. 59</h3>
+  <p class="snip">Здание с кадастровым номером 44:31:010316:68 площадь 141.1 по адресу Российская Федерация, Костромская область, г.о. город Шарья, пгт. Ветлужский, ул. Пролетарская, зд. 59а</p>
+  <div><span class="price">140 073 ₽</span></div>
+  <div class="meta2"><span class="end">до 02.11.2026, 14:00 МСК</span><span class="timer" data-deadline="2026-11-02T14:00:00.000+00:00">осталось 26 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000024540000000112_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 21000024540000000112 · лот 1</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Продажа" data-price="414754" data-search="Помещение в 2-х этажном жилом доме, расположенное по адресу: Костромская область, Шарьинский район, город Шарья, п. Ветлужский, ул. Кооперативная, д. 5, пом. 8 Помещение с кадастровым номером 44:31:010107:468 площадь 23 по адресу Российская Федерация, Костромская область, г.о. город Шарья, пгт. Ветлужский, ул. Кооперативная, д. 5, пом. 8 № 21000024540000000110 · лот 1 21000024540000000110">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac5ee31b460354f7d1b3294" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Продажа">Продажа</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Помещение в 2-х этажном жилом доме, расположенное по адресу: Костромская область, Шарьинский район, город Шарья, п. Ветлужский, ул. Кооперативная, д. 5, пом. 8</h3>
+  <p class="snip">Помещение с кадастровым номером 44:31:010107:468 площадь 23 по адресу Российская Федерация, Костромская область, г.о. город Шарья, пгт. Ветлужский, ул. Кооперативная, д. 5, пом. 8</p>
+  <div><span class="price">414 754 ₽</span></div>
+  <div class="meta2"><span class="end">до 02.11.2026, 14:00 МСК</span><span class="timer" data-deadline="2026-11-02T14:00:00.000+00:00">осталось 26 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000024540000000110_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 21000024540000000110 · лот 1</span>
+  </div>
+</article>
 <article class="lot" data-card data-cat="Аренда" data-price="" data-search="аренда дер. Шолохово 1008 кв.м. аренда дер. Шолохово 1008 кв.м. № 24000017360000000525 · лот 1 24000017360000000525">
   <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abdf289ab6f6853706bf33a" alt="">
   <div class="badges">
@@ -4622,6 +4816,21 @@ footer .brand span{color:var(--amber)}
     <span class="nn">№ 21000018160000000164 · лот 1</span>
   </div>
 </article>
+<article class="lot" data-card data-cat="Аренда" data-price="" data-search="Информация о праве граждан, заинтересованных в предоставлении земельного участка, подавать заявления о намерении участвовать в аукционе по продаже  земельного участка земельный участок площадью 1030 кв.м, предназначенный для ведения личного подсобного хозяйства в границах населенного пункта № 22000164840000000052 · лот 1 22000164840000000052">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac63fa2aaef1b53b65c28dc" alt="">
+  <div class="badges">
+    <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Сообщение о предоставлении (реализации)</span>
+  </div>
+  <h3>Информация о праве граждан, заинтересованных в предоставлении земельного участка, подавать заявления о намерении участвовать в аукционе по продаже  земельного участка</h3>
+  <p class="snip">земельный участок площадью 1030 кв.м, предназначенный для ведения личного подсобного хозяйства в границах населенного пункта</p>
+  <div><span class="price">—</span></div>
+  <div class="meta2"><span class="end">до 06.11.2026, 14:00 МСК</span><span class="timer" data-deadline="2026-11-06T14:00:00.000+00:00">осталось 30 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/22000164840000000052_1" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <span class="nn">№ 22000164840000000052 · лот 1</span>
+  </div>
+</article>
 <article class="lot" data-card data-cat="Продажа" data-price="271440" data-search="Водонапорная башня Здание с кадастровым номером 44:18:100501:51 площадь 20.4 по адресу Российская Федерация, Костромская область, м.о. Поназыревский, пгт. Поназырево, ул. Вокзальная, соор. 1 № 22000069480000000034 · лот 1 22000069480000000034">
   <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abf894df72e2454efc6371c" alt="">
   <div class="badges">
@@ -4800,111 +5009,6 @@ footer .brand span{color:var(--amber)}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/22000201440000000022_1" target="_blank" rel="noopener">Портал торгов ↗</a>
     <span class="nn">№ 22000201440000000022 · лот 1</span>
-  </div>
-</article>
-<article class="lot over" data-card data-cat="Другое" data-price="" data-search="Присвоение статуса регионального оператора по обращению с твердыми коммунальными отходами на территории Костромской области в первой зоне деятельности   регионального оператора и п Деятельность в качестве регионального оператора по обращению с твердыми коммунальными отходами на территории Костромской области № 22000062960000000026 · лот 1 22000062960000000026">
-  
-  <div class="badges">
-    <span class="b deal-Другое">Другое</span>
-    <span class="b form">Конкурс</span>
-  </div>
-  <h3>Присвоение статуса регионального оператора по обращению с твердыми коммунальными отходами на территории Костромской области в первой зоне деятельности   регионального оператора и п</h3>
-  <p class="snip">Деятельность в качестве регионального оператора по обращению с твердыми коммунальными отходами на территории Костромской области</p>
-  <div><span class="price">—</span></div>
-  <div class="meta2"><span class="end">до 07.10.2026, 15:00 МСК</span><span class="timer over" data-deadline="2026-10-07T15:00:00.000+00:00">приём заявок завершён</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/22000062960000000026_1" target="_blank" rel="noopener">Портал торгов ↗</a>
-    <span class="nn">№ 22000062960000000026 · лот 1</span>
-  </div>
-</article>
-<article class="lot over" data-card data-cat="Аренда" data-price="5000" data-search="Земельный участок с кадастровым номером 44:07:070301:520, общей площадью 72 кв.м., расположенный по адресу: Российская Федерация,  Костромская область, муниципальный район Костромс Земельный участок с кадастровым номером 44:07:070301:520, общей площадью 72 кв.м., расположенный по адресу: Российская Федерация, Костромская область, муниципальный район Костромской, деревня Куликово № 21000026310000001224 · лот 1 21000026310000001224">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6a8fd4f1e096f456f84dc9e8" alt="">
-  <div class="badges">
-    <span class="b deal-Аренда">Аренда</span>
-    <span class="b form">Электронный аукцион</span>
-  </div>
-  <h3>Земельный участок с кадастровым номером 44:07:070301:520, общей площадью 72 кв.м., расположенный по адресу: Российская Федерация,  Костромская область, муниципальный район Костромс</h3>
-  <p class="snip">Земельный участок с кадастровым номером 44:07:070301:520, общей площадью 72 кв.м., расположенный по адресу: Российская Федерация, Костромская область, муниципальный район Костромской, деревня Куликово</p>
-  <div><span class="price">5 000 ₽</span></div>
-  <div class="meta2"><span class="end">до 07.10.2026, 14:00 МСК</span><span class="timer over" data-deadline="2026-10-07T14:00:00.000+00:00">приём заявок завершён</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000026310000001224_1" target="_blank" rel="noopener">Портал торгов ↗</a>
-    <span class="nn">№ 21000026310000001224 · лот 1</span>
-  </div>
-</article>
-<article class="lot over" data-card data-cat="Аренда" data-price="" data-search="Земельный участок. Земельный участок с кадастровым номером 44:21:100206:296, площадью 873 кв.м, адрес земельного участка: Костромская обл., Судиславский р-н, п. Дружба, проезд Дорожный, з/у 9. Категория земель: земли на № 22000075430000000192 · лот 1 22000075430000000192">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6a9e9edc2e39753d02a8d5f1" alt="">
-  <div class="badges">
-    <span class="b deal-Аренда">Аренда</span>
-    <span class="b form">Сообщение о предоставлении (реализации)</span>
-  </div>
-  <h3>Земельный участок.</h3>
-  <p class="snip">Земельный участок с кадастровым номером 44:21:100206:296, площадью 873 кв.м, адрес земельного участка: Костромская обл., Судиславский р-н, п. Дружба, проезд Дорожный, з/у 9. Категория земель: земли на</p>
-  <div><span class="price">—</span></div>
-  <div class="meta2"><span class="end">до 07.10.2026, 14:00 МСК</span><span class="timer over" data-deadline="2026-10-07T14:00:00.000+00:00">приём заявок завершён</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/22000075430000000192_1" target="_blank" rel="noopener">Портал торгов ↗</a>
-    <span class="nn">№ 22000075430000000192 · лот 1</span>
-  </div>
-</article>
-<article class="lot over" data-card data-cat="Аренда" data-price="353000" data-search="продажа земельного участка с кадастровым номером 44:32:020219:585 земельный участок с кадастровым номером 44:32:020219:585 площадью 800 кв.м № 21000025010000000125 · лот 3 21000025010000000125">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ab21eb173b1b01331fa8474" alt="">
-  <div class="badges">
-    <span class="b deal-Аренда">Аренда</span>
-    <span class="b form">Электронный аукцион</span>
-  </div>
-  <h3>продажа земельного участка с кадастровым номером 44:32:020219:585</h3>
-  <p class="snip">земельный участок с кадастровым номером 44:32:020219:585 площадью 800 кв.м</p>
-  <div><span class="price">353 000 ₽</span></div>
-  <div class="meta2"><span class="end">до 07.10.2026, 14:00 МСК</span><span class="timer over" data-deadline="2026-10-07T14:00:00.000+00:00">приём заявок завершён</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000025010000000125_3" target="_blank" rel="noopener">Портал торгов ↗</a>
-    <span class="nn">№ 21000025010000000125 · лот 3</span>
-  </div>
-</article>
-<article class="lot over" data-card data-cat="Аренда" data-price="353000" data-search="продажа земельного участка с кадастровым номером 44:32:020219:610 Земельный участок с кадастровым номером 44:32:020219:610 площадью 800 кв.м № 21000025010000000125 · лот 2 21000025010000000125">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ab21dff9f00001edb5512d9" alt="">
-  <div class="badges">
-    <span class="b deal-Аренда">Аренда</span>
-    <span class="b form">Электронный аукцион</span>
-  </div>
-  <h3>продажа земельного участка с кадастровым номером 44:32:020219:610</h3>
-  <p class="snip">Земельный участок с кадастровым номером 44:32:020219:610 площадью 800 кв.м</p>
-  <div><span class="price">353 000 ₽</span></div>
-  <div class="meta2"><span class="end">до 07.10.2026, 14:00 МСК</span><span class="timer over" data-deadline="2026-10-07T14:00:00.000+00:00">приём заявок завершён</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000025010000000125_2" target="_blank" rel="noopener">Портал торгов ↗</a>
-    <span class="nn">№ 21000025010000000125 · лот 2</span>
-  </div>
-</article>
-<article class="lot over" data-card data-cat="Аренда" data-price="353000" data-search="продажа земельного участка с кадастровым номером 44:32:020219:599 Земельный участок с кадастровым номером 44:32:020219:599 площадью 800 кв.м № 21000025010000000125 · лот 1 21000025010000000125">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ab21d529f00001edb5511c3" alt="">
-  <div class="badges">
-    <span class="b deal-Аренда">Аренда</span>
-    <span class="b form">Электронный аукцион</span>
-  </div>
-  <h3>продажа земельного участка с кадастровым номером 44:32:020219:599</h3>
-  <p class="snip">Земельный участок с кадастровым номером 44:32:020219:599 площадью 800 кв.м</p>
-  <div><span class="price">353 000 ₽</span></div>
-  <div class="meta2"><span class="end">до 07.10.2026, 14:00 МСК</span><span class="timer over" data-deadline="2026-10-07T14:00:00.000+00:00">приём заявок завершён</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000025010000000125_1" target="_blank" rel="noopener">Портал торгов ↗</a>
-    <span class="nn">№ 21000025010000000125 · лот 1</span>
-  </div>
-</article>
-<article class="lot over" data-card data-cat="Аренда" data-price="" data-search="О возможности предоставления в собственность земельного участка с КН 44:01:080104:269, площадью 2020 кв.м., адрес: Российская Федерация, Костромская область, муниципальный округ Ан Земельный участок с КН 44:01:080104:269, площадью 2020 кв.м., адрес: Российская Федерация, Костромская область, муниципальный округ Антроповский, деревня Просек, улица Новая, земельный участок 7 А. Ка № 22000168160000000085 · лот 1 22000168160000000085">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6a9a89e37d8acd58834086d8" alt="">
-  <div class="badges">
-    <span class="b deal-Аренда">Аренда</span>
-    <span class="b form">Сообщение о предоставлении (реализации)</span>
-  </div>
-  <h3>О возможности предоставления в собственность земельного участка с КН 44:01:080104:269, площадью 2020 кв.м., адрес: Российская Федерация, Костромская область, муниципальный округ Ан</h3>
-  <p class="snip">Земельный участок с КН 44:01:080104:269, площадью 2020 кв.м., адрес: Российская Федерация, Костромская область, муниципальный округ Антроповский, деревня Просек, улица Новая, земельный участок 7 А. Ка</p>
-  <div><span class="price">—</span></div>
-  <div class="meta2"><span class="end">до 07.10.2026, 06:00 МСК</span><span class="timer over" data-deadline="2026-10-07T06:00:00.000+00:00">приём заявок завершён</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/22000168160000000085_1" target="_blank" rel="noopener">Портал торгов ↗</a>
-    <span class="nn">№ 22000168160000000085 · лот 1</span>
   </div>
 </article>
   </div>

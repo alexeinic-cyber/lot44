@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аналитика торгов Костромской области | ЛОТ 44</title>
+<meta name="description" content="Аналитический дашборд по торгам Костромской области: структура рынка, география, сроки, ценовые сегменты, наследие.">
+<style>
+:root{
+  --navy:#14213D; --navy2:#1F2F55; --amber:#FCA311; --bg:#f2f4f8; --card:#fff;
+  --ink:#1c1e21; --muted:#6b7280; --line:#e5e7eb; --green:#047857; --blue:#1d4ed8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:inherit}
+.hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 22px 22px}
+.wrap{max-width:1180px;margin:0 auto}
+.brandrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brandrow .l{font-weight:800;font-size:22px}
+.brandrow .l .n{color:var(--amber)}
+.hero h1{margin:10px 0 6px;font-size:26px;line-height:1.25}
+.hero p{margin:0;color:#c8d3ea;font-size:14.5px}
+.meta{margin-top:12px;font-size:13px;color:#9fb0d0}
+.meta a{color:#FCA311;font-weight:700}
+.controls{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);
+          padding:12px 22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.controls input[type=search]{flex:1 1 260px;min-width:200px;padding:10px 14px;border:1px solid var(--line);
+          border-radius:10px;font-size:14.5px;outline:none}
+.controls input[type=search]:focus{border-color:var(--amber)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13.5px;
+      cursor:pointer;font-weight:600;color:#374151}
+.chip.on{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+.count{font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}
+main{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.lot,.obj{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;
+          display:flex;flex-direction:column;gap:10px}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.b{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#eef2ff;color:#1d4ed8}
+.b.deal-Продажа{background:#dcfce7;color:#047857}
+.b.deal-Аренда{background:#dbeafe;color:#1d4ed8}
+.b.deal-Другое{background:#f3f4f6;color:#4b5563}
+.b.form{background:#f3f4f6;color:#374151}
+.b.okn{background:var(--amber);color:var(--navy)}
+.b.new{background:#d1fae5;color:#047857}
+.lot .photo{width:100%;height:170px;object-fit:cover;border-radius:10px;display:block;background:#eef1f6}
+.lot.over{opacity:.72}
+.timer{color:var(--muted)}
+.timer.urgent{color:#b45309;font-weight:700}
+.timer.crit{color:#dc2626;font-weight:800}
+.timer.over{color:#9ca3af}
+.pslide{display:flex;flex-direction:column;gap:4px;flex:0 1 240px;min-width:210px}
+.pslide .ps-label{font-size:12.5px;color:var(--muted)}
+.pslide .ps-label b{color:var(--ink)}
+.ps-track{position:relative;height:24px}
+.ps-track input[type=range]{position:absolute;left:0;top:0;width:100%;height:24px;margin:0;background:transparent;
+  -webkit-appearance:none;appearance:none;pointer-events:none}
+.ps-track input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;background:var(--amber);border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(20,33,61,.35);cursor:pointer}
+.ps-track input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;
+  background:var(--amber);border:2px solid #fff;box-shadow:0 1px 4px rgba(20,33,61,.35);cursor:pointer}
+.ps-track::before{content:"";position:absolute;left:2px;right:2px;top:11px;height:3px;border-radius:2px;background:var(--line)}
+h3{margin:0;font-size:16px;line-height:1.35}
+.snip{margin:0;color:var(--muted);font-size:13.5px}
+.price{font-weight:800;font-size:18px;color:var(--navy)}
+.meta2{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.meta2 .urgent{color:#b45309;font-weight:700}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;margin-top:auto}
+.foot a{color:var(--blue);font-weight:600;text-decoration:none}
+.nn{color:var(--muted);font-size:12px}
+.empty{text-align:center;padding:48px;color:var(--muted)}
+footer{background:var(--navy);color:#9fb0d0;padding:28px 22px;margin-top:40px;font-size:13px;line-height:1.6}
+footer a{color:#FCA311;font-weight:700}
+footer .brand{color:#fff;font-weight:800;margin-bottom:8px;font-size:16px}
+footer .brand span{color:var(--amber)}
+.tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tab{display:inline-block;padding:7px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
+     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#eaf1ff;text-decoration:none}
+.tab.on{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+.dash{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi-v{font-size:23px;font-weight:800;color:var(--navy);line-height:1.15}
+.kpi-t{font-size:12.5px;color:var(--muted);margin-top:4px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.dash-grid .wide{grid-column:1/-1}
+.dash-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+           display:flex;flex-direction:column;gap:10px}
+.dash-title{font-weight:800;font-size:15.5px;color:var(--ink)}
+.dash-sub{color:var(--muted);font-size:12.5px;margin-top:-6px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;font-size:13px}
+.bar-label{color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{background:#eef1f6;border-radius:6px;height:16px;overflow:hidden}
+.bar-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#FCA311,#ffc766)}
+.bar-fill.bluefill{background:linear-gradient(90deg,#1d4ed8,#6d9bf1)}
+.bar-fill.greenfill{background:linear-gradient(90deg,#047857,#4bc09a)}
+.bar-val{text-align:right;font-weight:700;color:var(--ink)}
+.stack{display:flex;height:22px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.seg{display:block;height:100%}
+.seg-sale{background:#047857}.seg-rent{background:#1d4ed8}.seg-other{background:#9ca3af}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:#374151}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.legend .li-sale{background:#047857}.legend .li-rent{background:#1d4ed8}.legend .li-other{background:#9ca3af}
+.tlist{display:flex;flex-direction:column;gap:2px}
+a.trow{display:flex;gap:10px;align-items:baseline;font-size:13.5px;color:inherit;text-decoration:none;
+       padding:7px 6px;border-bottom:1px dashed var(--line);border-radius:8px}
+a.trow:last-child{border-bottom:none}
+a.trow:hover{background:#f6f8fd}
+.trow .num{color:var(--muted);min-width:22px;font-weight:700}
+.trow .nm{flex:1;overflow:hidden}
+.trow .pr{font-weight:800;white-space:nowrap;color:var(--navy)}
+.trow .dl{color:var(--muted);white-space:nowrap;font-size:12.5px}
+.hint{font-size:12.5px;color:var(--muted)}
+@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}.pslide{flex:1 1 100%;min-width:0}
+  .bar-row{grid-template-columns:104px 1fr 44px}.dash-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
+      <span style="color:#9fb0d0;font-size:14px">аналитика</span></div>
+    <h1>Аналитика торгов Костромской области</h1>
+    <p>Сводная картина по активным лотам: структура рынка, география, сроки, ценовые сегменты
+       и объекты культурного наследия. Данные: портал торгов <strong>torgi.gov.ru</strong>.</p>
+    <div class="tabs">
+      <a class="tab" href="index.html">Торги</a>
+      <span class="tab on">Аналитика</span>
+    </div>
+    <div class="meta">Обновлено: 07.10.2026, 20:55 МСК · активных лотов: 324 · объектов «Наследия»: 109
+      · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
+  </div>
+</header>
+<main class="dash">
+  <div class="kpis"><div class="kpi"><div class="kpi-v">324</div><div class="kpi-t">Активных лотов</div></div><div class="kpi"><div class="kpi-v">518,3 млн ₽</div><div class="kpi-t">Суммарная начальная цена</div></div><div class="kpi"><div class="kpi-v">48</div><div class="kpi-t">Срочных (до 3 дней)</div></div><div class="kpi"><div class="kpi-v">6</div><div class="kpi-t">Лотов с меткой «ОКН»</div></div><div class="kpi"><div class="kpi-v">109</div><div class="kpi-t">Объектов на «Наследии»</div></div></div>
+  <div class="dash-grid">
+    <section class="dash-card">
+      <div class="dash-title">Структура рынка по типу сделки</div>
+      <div class="dash-sub">Распределение активных лотов: продажа / аренда / прочее</div>
+      <div class="stack"><span class="seg seg-sale" style="width:20.68%" title="Продажа: 67"></span><span class="seg seg-rent" style="width:47.53%" title="Аренда: 154"></span><span class="seg seg-other" style="width:31.79%" title="Другое: 103"></span></div>
+      <div class="legend"><span><i class="li-sale"></i>Продажа — <b>67</b></span><span><i class="li-rent"></i>Аренда — <b>154</b></span><span><i class="li-other"></i>Другое — <b>103</b></span></div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Объекты культурного наследия</div>
+      <div class="dash-sub">Статусы объектов на платформе «Наследие» ДОМ.РФ</div>
+      <div class="bars"><div class="bar-row"><span class="bar-label" title="Конкурс объявлен">Конкурс объявлен</span><span class="bar-track"><span class="bar-fill greenfill" style="width:16%"></span></span><span class="bar-val">7</span></div><div class="bar-row"><span class="bar-label" title="Подготовка к торгам">Подготовка к торгам</span><span class="bar-track"><span class="bar-fill greenfill" style="width:100%"></span></span><span class="bar-val">43</span></div><div class="bar-row"><span class="bar-label" title="Инвестор найден">Инвестор найден</span><span class="bar-track"><span class="bar-fill greenfill" style="width:58%"></span></span><span class="bar-val">25</span></div><div class="bar-row"><span class="bar-label" title="Решение отсутствует">Решение отсутствует</span><span class="bar-track"><span class="bar-fill greenfill" style="width:79%"></span></span><span class="bar-val">34</span></div><div class="bar-row"><span class="bar-label" title="Восстановлен">Восстановлен</span><span class="bar-track"><span class="bar-fill greenfill" style="width:0%"></span></span><span class="bar-val">0</span></div></div>
+      <div class="hint">Плюс лоты с меткой «ОКН» на витрине: 6</div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">География лотов — топ-10</div>
+      <div class="dash-sub">Локации активных лотов (по адресам из описаний, оценочно)</div>
+      <div class="bars"><div class="bar-row"><span class="bar-label" title="г. Кострома">г. Кострома</span><span class="bar-track"><span class="bar-fill bluefill" style="width:100%"></span></span><span class="bar-val">32</span></div><div class="bar-row"><span class="bar-label" title="Костромской р-н">Костромской р-н</span><span class="bar-track"><span class="bar-fill bluefill" style="width:50%"></span></span><span class="bar-val">16</span></div><div class="bar-row"><span class="bar-label" title="г. Мантурово">г. Мантурово</span><span class="bar-track"><span class="bar-fill bluefill" style="width:38%"></span></span><span class="bar-val">12</span></div><div class="bar-row"><span class="bar-label" title="г. Галич">г. Галич</span><span class="bar-track"><span class="bar-fill bluefill" style="width:31%"></span></span><span class="bar-val">10</span></div><div class="bar-row"><span class="bar-label" title="г. Шарья">г. Шарья</span><span class="bar-track"><span class="bar-fill bluefill" style="width:22%"></span></span><span class="bar-val">7</span></div><div class="bar-row"><span class="bar-label" title="г. Нерехта">г. Нерехта</span><span class="bar-track"><span class="bar-fill bluefill" style="width:22%"></span></span><span class="bar-val">7</span></div><div class="bar-row"><span class="bar-label" title="г. Буй">г. Буй</span><span class="bar-track"><span class="bar-fill bluefill" style="width:19%"></span></span><span class="bar-val">6</span></div><div class="bar-row"><span class="bar-label" title="Красносельский р-н">Красносельский р-н</span><span class="bar-track"><span class="bar-fill bluefill" style="width:19%"></span></span><span class="bar-val">6</span></div><div class="bar-row"><span class="bar-label" title="Красносельский">Красносельский</span><span class="bar-track"><span class="bar-fill bluefill" style="width:19%"></span></span><span class="bar-val">6</span></div><div class="bar-row"><span class="bar-label" title="г. Нея">г. Нея</span><span class="bar-track"><span class="bar-fill bluefill" style="width:9%"></span></span><span class="bar-val">3</span></div></div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Формы проведения торгов — топ-6</div>
+      <div class="dash-sub">Аукцион, публичное предложение, конкурс и другие</div>
+      <div class="bars"><div class="bar-row"><span class="bar-label" title="Электронный аукцион">Электронный аукцион</span><span class="bar-track"><span class="bar-fill bluefill" style="width:100%"></span></span><span class="bar-val">213</span></div><div class="bar-row"><span class="bar-label" title="Сообщение о предоставлении (реализации)">Сообщение о предоставлении (реализации)</span><span class="bar-track"><span class="bar-fill bluefill" style="width:31%"></span></span><span class="bar-val">65</span></div><div class="bar-row"><span class="bar-label" title="Конкурс">Конкурс</span><span class="bar-track"><span class="bar-fill bluefill" style="width:11%"></span></span><span class="bar-val">24</span></div><div class="bar-row"><span class="bar-label" title="Публичное предложение">Публичное предложение</span><span class="bar-track"><span class="bar-fill bluefill" style="width:5%"></span></span><span class="bar-val">11</span></div><div class="bar-row"><span class="bar-label" title="Электронный конкурс">Электронный конкурс</span><span class="bar-track"><span class="bar-fill bluefill" style="width:4%"></span></span><span class="bar-val">5</span></div><div class="bar-row"><span class="bar-label" title="Продажа по минимально допустимой цене">Продажа по минимально допустимой цене</span><span class="bar-track"><span class="bar-fill bluefill" style="width:4%"></span></span><span class="bar-val">5</span></div></div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Срочность: дедлайны заявок</div>
+      <div class="dash-sub">Сколько лотов закрывается в ближайшие периоды</div>
+      <div class="bars"><div class="bar-row"><span class="bar-label" title="до 3 дней">до 3 дней</span><span class="bar-track"><span class="bar-fill " style="width:31%"></span></span><span class="bar-val">48</span></div><div class="bar-row"><span class="bar-label" title="4–7 дней">4–7 дней</span><span class="bar-track"><span class="bar-fill " style="width:20%"></span></span><span class="bar-val">31</span></div><div class="bar-row"><span class="bar-label" title="8–14 дней">8–14 дней</span><span class="bar-track"><span class="bar-fill " style="width:50%"></span></span><span class="bar-val">78</span></div><div class="bar-row"><span class="bar-label" title="15–30 дней">15–30 дней</span><span class="bar-track"><span class="bar-fill " style="width:100%"></span></span><span class="bar-val">155</span></div><div class="bar-row"><span class="bar-label" title="больше 30 дней">больше 30 дней</span><span class="bar-track"><span class="bar-fill " style="width:8%"></span></span><span class="bar-val">12</span></div><div class="bar-row"><span class="bar-label" title="без срока">без срока</span><span class="bar-track"><span class="bar-fill " style="width:0%"></span></span><span class="bar-val">0</span></div></div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Ценовые сегменты</div>
+      <div class="dash-sub">Распределение активных лотов по начальной цене</div>
+      <div class="bars"><div class="bar-row"><span class="bar-label" title="до 100 тыс. ₽">до 100 тыс. ₽</span><span class="bar-track"><span class="bar-fill " style="width:66%"></span></span><span class="bar-val">58</span></div><div class="bar-row"><span class="bar-label" title="100–500 тыс. ₽">100–500 тыс. ₽</span><span class="bar-track"><span class="bar-fill " style="width:90%"></span></span><span class="bar-val">79</span></div><div class="bar-row"><span class="bar-label" title="0,5–1 млн ₽">0,5–1 млн ₽</span><span class="bar-track"><span class="bar-fill " style="width:39%"></span></span><span class="bar-val">34</span></div><div class="bar-row"><span class="bar-label" title="1–5 млн ₽">1–5 млн ₽</span><span class="bar-track"><span class="bar-fill " style="width:55%"></span></span><span class="bar-val">48</span></div><div class="bar-row"><span class="bar-label" title="5–10 млн ₽">5–10 млн ₽</span><span class="bar-track"><span class="bar-fill " style="width:5%"></span></span><span class="bar-val">4</span></div><div class="bar-row"><span class="bar-label" title="от 10 млн ₽">от 10 млн ₽</span><span class="bar-track"><span class="bar-fill " style="width:15%"></span></span><span class="bar-val">13</span></div><div class="bar-row"><span class="bar-label" title="без указанной цены">без указанной цены</span><span class="bar-track"><span class="bar-fill " style="width:100%"></span></span><span class="bar-val">88</span></div></div>
+    </section>
+    <section class="dash-card wide">
+      <div class="dash-title">Топ-10 самых дорогих лотов</div>
+      <div class="dash-sub">Крупнейшие предложения по начальной цене</div>
+      <div class="tlist"><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000028180000001347_3" target="_blank" rel="noopener"><span class="num">1</span><span class="nm">Лом черных и цветных металлов</span><span class="pr">37 272 340 ₽</span><span class="dl">до 19.10.2026, 15:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000034760000002017_1" target="_blank" rel="noopener"><span class="num">2</span><span class="nm">Продажа находящегося в федеральной собственности земельного участка площадью  11 010 кв. метров (кадастровый номер 44:27:050601:903), местоположение: установлено относительно ориен</span><span class="pr">37 147 000 ₽</span><span class="dl">до 26.10.2026, 12:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000028180000001364_3" target="_blank" rel="noopener"><span class="num">3</span><span class="nm">Лом цветных металлов</span><span class="pr">31 840 000 ₽</span><span class="dl">до 28.10.2026, 15:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000028180000001364_1" target="_blank" rel="noopener"><span class="num">4</span><span class="nm">Лом цветных металлов</span><span class="pr">31 840 000 ₽</span><span class="dl">до 28.10.2026, 15:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000028180000001364_2" target="_blank" rel="noopener"><span class="num">5</span><span class="nm">Лом цветных металлов</span><span class="pr">31 840 000 ₽</span><span class="dl">до 28.10.2026, 15:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000028180000001364_4" target="_blank" rel="noopener"><span class="num">6</span><span class="nm">Лом цветных металлов</span><span class="pr">31 840 000 ₽</span><span class="dl">до 28.10.2026, 15:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000028180000001347_1" target="_blank" rel="noopener"><span class="num">7</span><span class="nm">Лом цветных металлов</span><span class="pr">31 840 000 ₽</span><span class="dl">до 19.10.2026, 15:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000028180000001347_2" target="_blank" rel="noopener"><span class="num">8</span><span class="nm">Лом цветных металлов</span><span class="pr">31 840 000 ₽</span><span class="dl">до 19.10.2026, 15:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000026310000001241_1" target="_blank" rel="noopener"><span class="num">9</span><span class="nm">-  нежилое строение (здание школы) с  кад.ном. 44:07:010104:88,  998,9 кв.м., по адресу: Костромская обл., Костромской р-н, п. Апраксино, ул. Коммунаров, д. 28 с зем. уч, необходим</span><span class="pr">20 503 000 ₽</span><span class="dl">до 20.10.2026, 14:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000034760000002022_1" target="_blank" rel="noopener"><span class="num">10</span><span class="nm">Продажа находящегося в федеральной собственности объекта недвижимого имущества площадью 1 925 кв. метров (кадастровый номер 44:07:030101:168), по адресу: Костромская область, п. Ка</span><span class="pr">17 170 000 ₽</span><span class="dl">до 26.10.2026, 12:00 МСК</span></a></div>
+    </section>
+    <section class="dash-card wide">
+      <div class="dash-title">⚡ Срочные лоты: заявки закрываются ≤ 3 дней</div>
+      <div class="dash-sub">Успейте изучить документацию и подать заявку</div>
+      <div class="tlist"><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003272_1" target="_blank" rel="noopener"><span class="nm">Итого по лоту – 196 куб. м. древесины.</span><span class="pr">788 ₽</span><span class="dl">до 07.10.2026, 20:59 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003271_1" target="_blank" rel="noopener"><span class="nm">Итого по лоту – 82 куб. м. древесины.</span><span class="pr">1 022 ₽</span><span class="dl">до 07.10.2026, 20:59 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000022980000000383_1" target="_blank" rel="noopener"><span class="nm">Земельный участок</span><span class="pr">—</span><span class="dl">до 07.10.2026, 21:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000151050000000577_1" target="_blank" rel="noopener"><span class="nm">Право на заключение договора водопользования</span><span class="pr">7 999 ₽</span><span class="dl">до 08.10.2026, 07:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000154910000000074_1" target="_blank" rel="noopener"><span class="nm">Нежилое здание, общая площадь 94,6 кв.м., расположенное по адресу: Костромская область, Вохомский район, п.Талица, ул.Строительная, д.40, кадастровый №44:03:131106:55</span><span class="pr">2 270 ₽</span><span class="dl">до 08.10.2026, 13:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000169640000000172_1" target="_blank" rel="noopener"><span class="nm">Земельный участок, вид разрешенного использования – для ведения личного подсобного хозяйства на полевых участках</span><span class="pr">—</span><span class="dl">до 08.10.2026, 13:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000169640000000171_1" target="_blank" rel="noopener"><span class="nm">Земельный участок, вид разрешенного использования – для ведения личного подсобного хозяйства</span><span class="pr">—</span><span class="dl">до 08.10.2026, 13:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000169640000000170_1" target="_blank" rel="noopener"><span class="nm">Земельный участок, вид разрешенного использования – для ведения личного подсобного хозяйства</span><span class="pr">—</span><span class="dl">до 08.10.2026, 13:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000154910000000073_1" target="_blank" rel="noopener"><span class="nm">Земельный участок</span><span class="pr">—</span><span class="dl">до 08.10.2026, 14:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/22000154910000000072_1" target="_blank" rel="noopener"><span class="nm">Земельный участок</span><span class="pr">—</span><span class="dl">до 08.10.2026, 14:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000026310000001225_1" target="_blank" rel="noopener"><span class="nm">Земельный участок с кадастровым номером 44:07:021415:56, общей площадью 2380 кв.м. Местоположение установлено относительно ориентира, расположенного за пределами участка. Ориентир </span><span class="pr">320 000 ₽</span><span class="dl">до 08.10.2026, 14:00 МСК</span></a><a class="trow" href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003246_19" target="_blank" rel="noopener"><span class="nm">Автобус Mercedes Benz 223201, 2014 года выпуска, государственный номер O687XX44, идентификационный номер (VIN) Z7C223201E0002151, цвет белый.  Правообладатель – Критский С.В</span><span class="pr">1 158 634 ₽</span><span class="dl">до 08.10.2026, 20:59 МСК</span></a></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between">
+    <div style="flex:1;min-width:260px">
+      <div class="brand">ЛОТ <span>44</span></div>
+      Неофициальный агрегатор имущественных торгов Костромской области.<br>
+      Данные: портал торгов torgi.gov.ru. Лоты, относящиеся к объектам культурного наследия,
+      отмечены значком «ОКН». Не является офертой и юридической консультацией. Решения принимаете вы.
+    </div>
+    <div style="min-width:160px">
+      <div style="color:#fff;font-weight:600;margin-bottom:8px">Канал</div>
+      <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
