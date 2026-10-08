@@ -1,0 +1,18 @@
+name: Probe site fetch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch tests
+        run: |
+          for url in "https://lot44.ru/" "https://lot44.ru/analytics.html" "https://alexeinic-cyber.github.io/lot44/" "https://capable-kitsune-0951ab.netlify.app/"; do
+            echo "=== $url ==="
+            curl -sS -o /tmp/out.html --max-time 50 -w "code=%{http_code} size=%{size_download} time=%{time_total}s speed=%{speed_download}B/s\n" "$url" || echo "curl failed rc=$?"
+            wc -c /tmp/out.html 2>/dev/null || true
+            head -c 300 /tmp/out.html 2>/dev/null | tr -d '\n' | head -c 200 || true
+            echo ""
+          done
