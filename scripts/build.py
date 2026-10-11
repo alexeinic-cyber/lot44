@@ -447,6 +447,11 @@ footer .brand span{color:var(--amber)}
 .dash{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:14px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.insights{display:flex;flex-direction:column;gap:8px}
+.insight{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14.5px}
+.ins-ico{flex:0 0 auto;font-size:18px;line-height:1.4}
+.ins-txt{color:var(--ink)}
+.ins-txt b{color:var(--navy)}
 .kpi-v{font-size:23px;font-weight:800;color:var(--navy);line-height:1.15}
 .kpi-t{font-size:12.5px;color:var(--muted);margin-top:4px}
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
@@ -512,7 +517,9 @@ JS_FILTER = """
     cards.forEach(c => {
       const hay = (c.dataset.search || '').toLowerCase();
       const cat = c.dataset.cat || '';
-      const okCat = filter === 'Все' || cat === filter;
+      const okCat = (filter === 'Все' || cat === filter ||
+                     (filter === '⏳ Скоро' && c.dataset.dl !== '' && (+c.dataset.dl) <= 7) ||
+                     (filter === '🏛 ОКН' && c.dataset.okn === '1'));
       const okQ = !term || hay.includes(term);
       let okP = true;
       if (pr && !pr.full){
@@ -679,9 +686,10 @@ def render_torgi(lots: list[dict], updated: str) -> str:
         photo = (f'<img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" '
                  f'src="{esc(L["img"])}" alt="">') if L.get("img") else ''
         price_attr = f'{L["price_num"]:.0f}' if L.get("price_num") is not None else ''
+        dl_attr = f'{d:.0f}' if (not over and d is not None) else ''
         search = f"{L['name']} {L['snip']} {L['nn']} {L['notice']}" + (" ОКН" if L.get("okn") else "")
         cards.append(f'''
-<article class="{('lot over' if over else 'lot')}" data-card data-cat="{L['deal']}" data-price="{price_attr}" data-search="{esc(search)}">
+<article class="{('lot over' if over else 'lot')}" data-card data-cat="{L['deal']}" data-price="{price_attr}" data-dl="{dl_attr}" data-okn="{'1' if L.get('okn') else ''}" data-search="{esc(search)}">
   {photo}
   <div class="badges">
     {new_span}{okn_span}<span class="b deal-{L['deal']}">{esc(L['deal'])}</span>
@@ -697,7 +705,7 @@ def render_torgi(lots: list[dict], updated: str) -> str:
   </div>
 </article>''')
 
-    chips = ["Все", "Продажа", "Аренда", "Другое"]
+    chips = ["Все", "Продажа", "Аренда", "Другое", "⏳ Скоро", "🏛 ОКН"]
     chip_html = "".join(
         f'<button type="button" class="chip{" on" if c=="Все" else ""}" data-filter="{c}">{c}</button>'
         for c in chips
@@ -861,6 +869,47 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
         for L in urg_list
     )
 
+    # 9. инсайты («Главное сейчас»)
+    new_week = sum(1 for L in active if L.get("is_new"))
+    soon_cnt = sum(1 for L in active if (lambda dt: dt is not None and 0 <= (dt - now).total_seconds() <= 7 * 86400)(dtime(L)))
+    cheap = sum(1 for L in active if L.get("price_num") is not None and L["price_num"] <= 100_000)
+    okn_lots_n = sum(1 for L in active if L.get("okn"))
+    top_geo_name = (top_geo[0][0] if top_geo else "—")
+    insights = [
+        ("🆕", "<b>%d новых</b> лотов опубликовано за последние 3 дня" % new_week),
+        ("⏳", "<b>%d лотов</b> закрывают приём заявок в течение 7 дней" % soon_cnt),
+        ("💸", "<b>%d объектов</b> дешевле 100 000 ₽ — входной порог минимален" % cheap),
+        ("🏛", "<b>%d лотов</b> с меткой ОКН + %d объектов на платформе «Наследие»" % (okn_lots_n, len(objs)) if objs else "<b>%d лотов</b> с меткой ОКН" % okn_lots_n),
+        ("📍", "Самая активная локация недели: <b>%s</b>" % esc(top_geo_name)),
+    ]
+    insights_html = "".join(
+        '<div class="insight"><span class="ins-ico">%s</span><span class="ins-txt">%s</span></div>' % (ico, txt)
+        for ico, txt in insights
+    )
+
+    # 10. динамика публикаций по неделям (по дате публикации, активные лоты)
+    import datetime as _dt
+    week_bins = []
+    for i in range(7, -1, -1):
+        end = now - _dt.timedelta(days=7 * i)
+        start = end - _dt.timedelta(days=7)
+        cnt = 0
+        for L in active:
+            pd = parse_dt(L.get("pub_raw") or "")
+            if pd is not None and start <= pd < end:
+                cnt += 1
+        week_bins.append((start, end, cnt))
+    max_wk = max([c for _, _, c in week_bins] + [1])
+    weeks_rows = []
+    for start, end, cnt in week_bins:
+        w = 0 if not cnt else max(4, round(cnt / max_wk * 100))
+        label = "%02d" % start.day + "." + "%02d" % start.month + ("–" + "%02d" % end.day + "." + "%02d" % end.month if (end - start).days > 1 else "")
+        weeks_rows.append(
+            '<div class="bar-row"><span class="bar-label" title="публикации %s">%s</span>'
+            '<span class="bar-track"><span class="bar-fill bluefill" style="width:%d%%"></span></span>'
+            '<span class="bar-val">%d</span></div>' % (label, label, w, cnt))
+    weeks_block = '<div class="bars">' + "".join(weeks_rows) + "</div>"
+
     # KPI
     total_sum = sum(L["price_num"] for L in active if L.get("price_num"))
     kpis = [
@@ -921,6 +970,16 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
 <main class="dash">
   <div class="kpis">{kpi_html}</div>
   <div class="dash-grid">
+    <section class="dash-card wide">
+      <div class="dash-title">Главное сейчас</div>
+      <div class="dash-sub">Автоматические выводы из данных — обновляются с каждой сборкой</div>
+      <div class="insights">{insights_html}</div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Динамика публикаций по неделям</div>
+      <div class="dash-sub">Сколько активных лотов выставлено за каждую из последних 8 недель</div>
+      {weeks_block}
+    </section>
     <section class="dash-card">
       <div class="dash-title">Структура рынка по типу сделки</div>
       <div class="dash-sub">Распределение активных лотов: продажа / аренда / прочее</div>
