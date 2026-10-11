@@ -284,26 +284,24 @@ def fmt_money(v: float) -> str:
     if not v:
         return "—"
     if v >= 1_000_000_000:
-        s = "%.1f млрд ₽" % (v / 1_000_000_000)
-    elif v >= 1_000_000:
-        s = "%.1f млн ₽" % (v / 1_000_000)
-    elif v >= 1_000:
-        s = "%.0f тыс. ₽" % (v / 1_000)
-    else:
-        s = "%.0f ₽" % v
-    return s.replace(".", ",")
+        return ("%.1f" % (v / 1_000_000_000)).replace(".", ",") + " млрд ₽"
+    if v >= 1_000_000:
+        return ("%.1f" % (v / 1_000_000)).replace(".", ",") + " млн ₽"
+    if v >= 1_000:
+        return "%.0f тыс. ₽" % (v / 1_000)
+    return "%.0f ₽" % v
 
 
 _GEO_PATTERNS = [
-    (re.compile(r"г\.\s*([А-ЯЁ][а-яё\-]+)"), "г."),
-    (re.compile(r"город\s+([А-ЯЁ][а-яё\-]+)"), "г."),
-    (re.compile(r"пгт\.?\s*([А-ЯЁ][а-яё\-]+)"), "пгт"),
-    (re.compile(r"пос\.\s*([А-ЯЁ][а-яё\-]+)"), "п."),
-    (re.compile(r"п\.\s*([А-ЯЁ][а-яё\-]+)"), "п."),
-    (re.compile(r"с\.\s*([А-ЯЁ][а-яё\-]+)"), "с."),
-    (re.compile(r"м\.о\.\s*([А-ЯЁ][а-яё\-]+)"), "mo"),
-    (re.compile(r"([А-ЯЁ][а-яё\-]+)\s+(?:муниципальн[а-яё]*\s+)?район"), "rn"),
-    (re.compile(r"([А-ЯЁ][а-яё\-]+)\s+р-н"), "rn"),
+    (re.compile(r"г\.\s*([А-ЯЁ][А-Яа-яЁё\-]+)"), "г."),
+    (re.compile(r"город\s+([А-ЯЁ][А-Яа-яЁё\-]+)"), "г."),
+    (re.compile(r"пгт\.?\s*([А-ЯЁ][А-Яа-яЁё\-]+)"), "пгт"),
+    (re.compile(r"пос\.\s*([А-ЯЁ][А-Яа-яЁё\-]+)"), "п."),
+    (re.compile(r"п\.\s*([А-ЯЁ][А-Яа-яЁё\-]+)"), "п."),
+    (re.compile(r"с\.\s*([А-ЯЁ][А-Яа-яЁё\-]+)"), "с."),
+    (re.compile(r"м\.о\.\s*([А-ЯЁ][А-Яа-яЁё\-]+)"), "mo"),
+    (re.compile(r"([А-ЯЁ][А-Яа-яЁё\-]+)\s+(?:муниципальн[а-яё]*\s+)?район"), "rn"),
+    (re.compile(r"([А-ЯЁ][А-Яа-яЁё\-]+)\s+р-н"), "rn"),
 ]
 
 
@@ -455,6 +453,11 @@ footer .brand span{color:var(--amber)}
 .kpi-v{font-size:23px;font-weight:800;color:var(--navy);line-height:1.15}
 .kpi-t{font-size:12.5px;color:var(--muted);margin-top:4px}
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.heat-modes{display:flex;gap:8px;margin:2px 0 12px}
+.heat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:8px}
+.heat-tile{border:1px solid rgba(20,33,61,.10);border-radius:10px;padding:10px 12px;min-height:62px;display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+.ht-name{font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.25}
+.ht-val{font-size:19px;font-weight:800;color:var(--navy)}
 .dash-grid .wide{grid-column:1/-1}
 .dash-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
            display:flex;flex-direction:column;gap:10px}
@@ -587,6 +590,29 @@ JS_FILTER = """
   }
   tickTimers();
   setInterval(tickTimers, 60000);
+})();
+</script>
+"""
+
+
+HEAT_JS = """
+<script>
+(function(){
+  var btns = document.querySelectorAll('[data-hmode]');
+  var tiles = document.querySelectorAll('.heat-tile');
+  if (!tiles.length || !btns.length) return;
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      var m = b.dataset.hmode;
+      tiles.forEach(function(t){
+        t.style.background = (m === 'sum') ? t.dataset.s : t.dataset.c;
+        var v = t.querySelector('.ht-val');
+        if (v) v.textContent = (m === 'sum') ? t.dataset.st : t.dataset.ct;
+      });
+    });
+  });
 })();
 </script>
 """
@@ -802,6 +828,69 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
             geo[loc] += 1
     top_geo = geo.most_common(10)
 
+    # 3b. тепловая карта районов/городов (активные лоты)
+    heat, heat_disp = {}, {}
+    for L in active:
+        txt = (L.get("name") or "") + " " + (L.get("snip") or "")
+        loc = extract_location(txt)
+        if not loc:
+            continue
+        t = re.sub(r"\s+", " ", loc.strip())
+        tl = t.lower().replace(" район", " р-н").replace(" р-он", " р-н")
+        if tl not in heat:
+            heat[tl] = {"cnt": 0, "sum": 0.0, "okn": 0}
+            heat_disp[tl] = t
+        h = heat[tl]
+        h["cnt"] += 1
+        if L.get("price_num"):
+            h["sum"] += L["price_num"]
+        if L.get("okn"):
+            h["okn"] += 1
+        if txt.rstrip(" .,;").endswith(t):
+            h["trunc"] = True
+    for k in list(heat.keys()):
+        if not k.endswith(" р-н") and not k.startswith("г. ") and (k + " р-н") in heat:
+            tgt = k + " р-н"
+            heat[tgt]["cnt"] += heat[k]["cnt"]
+            heat[tgt]["sum"] += heat[k]["sum"]
+            heat[tgt]["okn"] += heat[k]["okn"]
+            if heat[k].get("trunc"):
+                heat[tgt]["trunc"] = True
+            del heat[k]
+    # склейка обрезанных названий («п. Шун» -> «п. Шунгенское»)
+    for k in sorted(list(heat.keys()), key=lambda x: len(x)):
+        if k not in heat or not heat[k].get("trunc") or len(k) < 6:
+            continue
+        tgt = None
+        for m in heat.keys():
+            if m != k and m.startswith(k) and len(m) > len(k):
+                tgt = m
+                break
+        if tgt:
+            heat[tgt]["cnt"] += heat[k]["cnt"]
+            heat[tgt]["sum"] += heat[k]["sum"]
+            heat[tgt]["okn"] += heat[k]["okn"]
+            del heat[k]
+    heat_top = sorted(heat.items(), key=lambda kv: (-kv[1]["cnt"], -kv[1]["sum"]))[:24]
+    mx_cnt = max([h["cnt"] for _, h in heat_top] + [1])
+    mx_sum = max([h["sum"] for _, h in heat_top] + [1.0])
+    tiles = []
+    for tl, h in heat_top:
+        name = heat_disp[tl] + ("…" if tl.endswith("-") else "")
+        bgc = "hsl(38,%d%%,%d%%)" % (int(35 + 50 * h["cnt"] / mx_cnt), int(97 - 38 * h["cnt"] / mx_cnt))
+        bgs = "hsl(38,%d%%,%d%%)" % (int(35 + 50 * h["sum"] / mx_sum), int(97 - 38 * h["sum"] / mx_sum))
+        tip = "%s — %d л." % (name, h["cnt"])
+        if h["sum"]:
+            tip += " · Σ %s" % fmt_money(h["sum"])
+        if h["okn"]:
+            tip += " · ОКН: %d" % h["okn"]
+        tiles.append(
+            '<div class="heat-tile" data-c="%s" data-s="%s" data-ct="%d" data-st="%s" title="%s">'
+            '<span class="ht-name">%s</span><span class="ht-val">%d</span></div>'
+            % (bgc, bgs, h["cnt"], esc(fmt_money(h["sum"]) if h["sum"] else "—"), esc(tip), esc(name), h["cnt"]))
+    heat_html = ('<div class="heat-grid">' + "".join(tiles) + "</div>") if tiles else '<div class="hint">Не удалось определить локации.</div>'
+    heat_js = HEAT_JS
+
     # 4. формы
     forms = Counter(re.sub(r"\s+", " ", L.get("form") or "—") for L in active)
     top_forms = forms.most_common(6)
@@ -996,6 +1085,16 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
       <div class="dash-title">География лотов — топ-10</div>
       <div class="dash-sub">Локации активных лотов (по адресам из описаний, оценочно)</div>
       {geo_block}
+    </section>
+    <section class="dash-card wide">
+      <div class="dash-title">Тепловая карта районов и городов</div>
+      <div class="dash-sub">Интенсивность цвета — количество лотов или сумма начальных цен; переключайте режим. Названия определены по адресам, оценочно.</div>
+      <div class="heat-modes">
+        <button type="button" class="chip on" data-hmode="cnt">по количеству лотов</button>
+        <button type="button" class="chip" data-hmode="sum">по сумме цен</button>
+      </div>
+      {heat_html}
+      {heat_js}
     </section>
     <section class="dash-card">
       <div class="dash-title">Формы проведения торгов — топ-6</div>
