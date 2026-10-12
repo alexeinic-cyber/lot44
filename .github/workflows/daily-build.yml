@@ -65,6 +65,8 @@ jobs:
       - name: Setup Pages
         if: steps.build.outputs.has_data == 'true'
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload Pages artifact
         if: steps.build.outputs.has_data == 'true'
