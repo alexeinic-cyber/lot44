@@ -761,6 +761,7 @@ def render_torgi(lots: list[dict], updated: str) -> str:
     <div class="tabs">
       <span class="tab on">Торги</span>
       <a class="tab" href="analytics.html">Аналитика</a>
+      <a class="tab" href="legislation.html">Законодательство</a>
     </div>
     <div class="meta">Обновлено: {esc(updated)} · активных лотов: {len(lots)}
       (Аренда: {counts.get('Аренда',0)} · Другое: {counts.get('Другое',0)} · Продажа: {counts.get('Продажа',0)}){okn_meta}{new_meta}
@@ -1051,6 +1052,7 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
     <div class="tabs">
       <a class="tab" href="index.html">Торги</a>
       <span class="tab on">Аналитика</span>
+      <a class="tab" href="legislation.html">Законодательство</a>
     </div>
     <div class="meta">Обновлено: {esc(updated)} · активных лотов: {len(active)} · объектов «Наследия»: {len(objs) if objs else "—"}
       · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
@@ -1120,6 +1122,129 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
       <div class="dash-title">⚡ Срочные лоты: заявки закрываются ≤ 3 дней</div>
       <div class="dash-sub">Успейте изучить документацию и подать заявку</div>
       <div class="tlist">{urg_rows or '<div class="hint">Срочных лотов сейчас нет.</div>'}</div>
+    </section>
+  </div>
+</main>
+{footer_html()}
+</body>
+</html>
+"""
+
+
+def render_legislation(updated: str) -> str:
+    """Курируемая карта законодательства: просветительский раздел."""
+    return f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Законодательство о торгах: карта для новичка | ЛОТ 44</title>
+<meta name="description" content="Понятная карта законов об имущественных торгах: 178-ФЗ, ГК РФ, 73-ФЗ (наследие), 44-ФЗ и 223-ФЗ, споры и защита. Простыми словами.">
+<style>{CSS}
+.res-chips{{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}}
+.res-chips a{{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;color:var(--navy);text-decoration:none;background:var(--card)}}
+.law-list{{margin:10px 0 0;padding-left:20px}}
+.law-list li{{margin:8px 0;font-size:14.5px}}
+.law-list b{{color:var(--navy)}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
+      <span style="color:#9fb0d0;font-size:14px">законодательство</span></div>
+    <h1>Законодательство: карта для новичка</h1>
+    <p>Какие законы управляют имущественными торгами области — простыми словами, без юридического языка.
+       Это карта, а не юридическая консультация: актуальные редакции ищите на официальных ресурсах.</p>
+    <div class="tabs">
+      <a class="tab" href="index.html">Торги</a>
+      <a class="tab" href="analytics.html">Аналитика</a>
+      <span class="tab on">Законодательство</span>
+    </div>
+    <div class="meta">Обновлено: {esc(updated)} · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
+  </div>
+</header>
+<main class="dash">
+  <div class="dash-grid">
+    <section class="dash-card wide">
+      <div class="dash-title">Официальные ресурсы</div>
+      <div class="dash-sub">Где проверять первоисточники — ссылки ведут на официальные порталы</div>
+      <div class="res-chips">
+        <a href="https://pravo.gov.ru/" target="_blank" rel="noopener">pravo.gov.ru — официальный портал правовой информации</a>
+        <a href="https://publication.pravo.gov.ru/" target="_blank" rel="noopener">publication.pravo.gov.ru — официальное опубликование</a>
+        <a href="https://torgi.gov.ru/" target="_blank" rel="noopener">torgi.gov.ru — портал торгов</a>
+        <a href="https://zakupki.gov.ru/" target="_blank" rel="noopener">zakupki.gov.ru — ЕИС (закупки)</a>
+        <a href="https://kad.arbitr.ru/" target="_blank" rel="noopener">kad.arbitr.ru — арбитражные дела</a>
+        <a href="https://fas.gov.ru/" target="_blank" rel="noopener">fas.gov.ru — ФАС России</a>
+      </div>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">С чего начать</div>
+      <div class="dash-sub">Три документа, с которых входит в тему любой новичок</div>
+      <ul class="law-list">
+        <li><b>178-ФЗ «О приватизации государственного и муниципального имущества»</b> — главный закон о том, как госимущество продаётся: способы, торги, публичное предложение, итоги.</li>
+        <li><b>Гражданский кодекс РФ</b> — общие правила сделок: купля-продажа и аренда.</li>
+        <li><b>Земельный кодекс РФ</b> — если в лоте есть участок: категории земель и виды разрешённого использования.</li>
+      </ul>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Процедуры: чем отличаются</div>
+      <div class="dash-sub">Формы проведения торгов на витрине проекта</div>
+      <ul class="law-list">
+        <li><b>Аукцион</b> — побеждает лучшая цена, шаг ставки задаётся заранее.</li>
+        <li><b>Конкурс</b> — оценивают не только цену, но и условия (обязательства, проект).</li>
+        <li><b>Публичное предложение</b> — цена снижается по графику, пока не подано первое заявление.</li>
+        <li><b>Продажа по минимально допустимой цене</b> — несостоявшиеся торги с повторным выставлением по сниженной цене.</li>
+        <li>Все формы проходят <b>электронно через ЭТП</b> — площадки из извещения.</li>
+      </ul>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Аренда госимущества</div>
+      <div class="dash-sub">Глава 34 ГК РФ и договор аренды</div>
+      <ul class="law-list">
+        <li>Аренда через торги: срок, целевое использование и порядок продления — в извещении и договоре.</li>
+        <li>У добросовестных арендаторов есть механизмы продления без торгов — условия уточняйте в документах лота.</li>
+        <li>Правило простое: извещение → осмотр → экономика → только потом заявка.</li>
+      </ul>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Объекты культурного наследия</div>
+      <div class="dash-sub">73-ФЗ — закон для «мечтателей усадеб»</div>
+      <ul class="law-list">
+        <li><b>73-ФЗ «Об объектах культурного наследия…»</b> — что такое ОКН, категории, территории и защитные зоны.</li>
+        <li><b>Предмет охраны</b> — что именно нельзя менять в здании.</li>
+        <li><b>Охранное обязательство</b> — требования к собственнику: сохранение, реставрация, доступ.</li>
+        <li>Работы согласуются с органом охраны наследия заранее; за повреждение памятника — ответственность.</li>
+      </ul>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">44-ФЗ и 223-ФЗ: закупки</div>
+      <div class="dash-sub">Законы о том, как государство покупает — а не продаёт</div>
+      <ul class="law-list">
+        <li><b>44-ФЗ «О контрактной системе»</b> — правила, по которым госорганы ЗАКУПАЮТ товары, работы и услуги. Пригодится новому владельцу госимущества: обслуживание объекта часто идёт через закупки.</li>
+        <li><b>223-ФЗ</b> — закупки корпораций, госкомпаний и МУПов (правила гибче, устанавливаются положением заказчика).</li>
+        <li>Ключевые понятия: заказчик, поставщик, НМЦК, ЭТП, обеспечение заявки.</li>
+        <li>Все закупки публикуются в ЕИС: zakupki.gov.ru.</li>
+      </ul>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Споры и защита прав</div>
+      <div class="dash-sub">Куда обращаться, если считаете торги нарушенными</div>
+      <ul class="law-list">
+        <li><b>135-ФЗ «О защите конкуренции»</b> — антимонопольные требования к торгам; жалобы — в ФАС.</li>
+        <li><b>ФАС России</b> (fas.gov.ru) — контроль процедур и рассмотрение жалоб участников.</li>
+        <li><b>kad.arbitr.ru</b> — картотека арбитражных дел: практика по спорам и проверка контрагентов.</li>
+      </ul>
+    </section>
+    <section class="dash-card">
+      <div class="dash-title">Памятки проекта «ЛОТ 44»</div>
+      <div class="dash-sub">Наши материалы простым языком</div>
+      <ul class="law-list">
+        <li><b>«Как участвовать в торгах: 5 шагов»</b> — от поиска лота до заявки.</li>
+        <li><b>«Наследие: 5 правил»</b> — что проверить до покупки памятника.</li>
+        <li><b>Разборы лотов и дайджесты</b> — каждую неделю в канале.</li>
+        <li>Все памятки — в группе <b>vk.ru/lot44</b> и в Telegram-канале проекта.</li>
+      </ul>
     </section>
   </div>
 </main>
@@ -1201,6 +1326,8 @@ def main() -> int:
 
     (SITE / "index.html").write_text(render_torgi(lots, updated), encoding="utf-8")
     (SITE / "analytics.html").write_text(render_analytics(lots, objs, updated), encoding="utf-8")
+    (SITE / "legislation.html").write_text(render_legislation(updated), encoding="utf-8")
+    print(f"[ok] site/legislation.html (законы)")
     n_photos = sum(1 for L in lots if L.get("img"))
     n_new = sum(1 for L in lots if L.get("is_new"))
     print(f"[ok] site/index.html ({len(lots)} lots, {n_photos} with photo, {n_new} new)")
