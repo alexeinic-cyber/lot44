@@ -391,9 +391,20 @@ a{color:inherit}
           border-radius:10px;font-size:14.5px;outline:none}
 .controls input[type=search]:focus{border-color:var(--amber)}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13.5px;
-      cursor:pointer;font-weight:600;color:#374151}
-.chip.on{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+.chip{border:1px solid rgba(20,33,61,.14);background:rgba(255,255,255,.65);border-radius:999px;padding:7px 14px;font-size:13.5px;
+      cursor:pointer;font-weight:600;color:#374151;
+      position:relative;overflow:hidden;
+      backdrop-filter:blur(8px) saturate(1.15);-webkit-backdrop-filter:blur(8px) saturate(1.15);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 2px rgba(20,33,61,.06),0 2px 6px rgba(20,33,61,.08);
+      transition:transform .16s ease, box-shadow .16s ease, background .16s ease}
+.chip::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+      background:radial-gradient(140px 60px at var(--mx,50%) var(--my,-20%),rgba(252,163,17,.18),rgba(255,255,255,0) 65%);
+      opacity:0;transition:opacity .2s ease}
+.chip:hover::before{opacity:1}
+.chip:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 6px 14px rgba(20,33,61,.14)}
+.chip:active{transform:scale(.96)}
+.chip.on{background:var(--amber);border-color:var(--amber);color:var(--navy);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 4px 12px rgba(252,163,17,.35)}
+.chip.on::before{display:none}
 .count{font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}
 main{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
@@ -442,6 +453,27 @@ footer .brand span{color:var(--amber)}
 .tab{display:inline-block;padding:7px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#eaf1ff;text-decoration:none}
 .tab.on{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+/* liquid glass pill (лёгкий, без JS-блика для .tab) */
+.tab{position:relative;overflow:hidden;backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);
+     box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 1px rgba(0,0,0,.18),0 6px 16px rgba(0,0,0,.20);
+     transition:transform .18s ease, box-shadow .18s ease, background .18s ease}
+.tab::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+     background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%)}
+.tab:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 10px 22px rgba(0,0,0,.28)}
+.tab:active{transform:translateY(0) scale(.98)}
+.tab.on{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 18px rgba(252,163,17,.35)}
+/* liquid glass c курсорным бликом (кнопки на карточках) */
+.lq{position:relative;overflow:hidden;border-radius:999px;
+    backdrop-filter:blur(12px) saturate(1.25);-webkit-backdrop-filter:blur(12px) saturate(1.25);
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.20),inset 0 -1px 1px rgba(0,0,0,.16),0 6px 14px rgba(0,0,0,.12);
+    transition:transform .16s ease, box-shadow .16s ease, background .16s ease}
+.lq::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+    background:radial-gradient(180px 100px at var(--mx,50%) var(--my,0%),rgba(255,255,255,.35),rgba(255,255,255,0) 60%)}
+.lq:hover{transform:translateY(-1px);background:rgba(255,255,255,.16)}
+.lq:active{transform:scale(.97)}
+.foot a.lq{color:var(--navy);font-weight:700;text-decoration:none;padding:7px 14px;font-size:13px;display:inline-block}
+.foot a.lq:hover{color:var(--navy)}
 .dash{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:14px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
@@ -726,7 +758,7 @@ def render_torgi(lots: list[dict], updated: str) -> str:
   <div><span class="price">{esc(L['price'])}</span></div>
   <div class="meta2"><span class="end">{esc(L['deadline'])}</span>{timer}</div>
   <div class="foot">
-    <a href="{esc(L['link'])}" target="_blank" rel="noopener">Портал торгов ↗</a>
+    <a href="{esc(L['link'])}" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
     <span class="nn">{esc(L['nn'])}</span>
   </div>
 </article>''')
@@ -1256,6 +1288,21 @@ def render_legislation(updated: str) -> str:
 
 def footer_html() -> str:
     return """
+<script>
+/* liquid glass: блик следует за курсором (только для .lq) */
+(function(){
+  document.querySelectorAll('.lq, .chip').forEach(function(el){
+    el.addEventListener('pointermove', function(e){
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+    el.addEventListener('pointerleave', function(){
+      el.style.removeProperty('--mx'); el.style.removeProperty('--my');
+    });
+  });
+})();
+</script>
 <footer>
   <div class="wrap" style="display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between">
     <div style="flex:1;min-width:260px">
