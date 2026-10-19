@@ -387,22 +387,49 @@ a{color:inherit}
 .hero{position:relative;overflow:hidden}
 .hero .bgimg{position:absolute;inset:-90px 0;background:url('assets/ipatievsky-700.jpg') center 35%/cover no-repeat;
   filter:blur(30px) saturate(1.05) brightness(.5);opacity:.55;
-  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.15);z-index:0}
+  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.15);z-index:0;
+  animation:bgdrift 26s ease-in-out infinite alternate}
+@keyframes bgdrift{from{transform:translate3d(var(--pmx,0px),calc(var(--par,0px) - 10px),0) scale(1.15)}
+  to{transform:translate3d(calc(var(--pmx,0px) + 16px),calc(var(--par,0px) + 10px),0) scale(1.2)}}
 .hero .bgshade{position:absolute;inset:0;z-index:1;
   background:linear-gradient(180deg,rgba(10,25,53,.78),rgba(10,25,53,.6) 45%,rgba(10,25,53,.9))}
 .hero .wrap{position:relative;z-index:2}
-.hero-ph{position:absolute;top:20px;bottom:20px;right:22px;z-index:2;display:flex;align-items:center;pointer-events:none}
+/* каскадное появление (в духе scrolltide): экспо-изинг */
+.hero .wrap>*{animation:rise .9s cubic-bezier(.22,1,.36,1) both}
+.hero .wrap>.anniv{animation-delay:.1s}
+.hero .wrap>h1{animation-delay:.18s}
+.hero .wrap>p{animation-delay:.28s}
+.hero .wrap>.tabs{animation-delay:.38s}
+.hero .wrap>.meta{animation-delay:.48s}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.hero-ph{position:absolute;top:20px;bottom:20px;right:22px;z-index:2;display:flex;align-items:center;pointer-events:none;
+  will-change:transform;transform:translate3d(0,var(--parp,0px),0)}
 .hero-ph img{display:block;max-height:100%;max-width:min(470px,36vw);width:auto;height:auto;object-fit:contain;
-  border-radius:14px;border:1px solid rgba(255,255,255,.3);
-  box-shadow:0 18px 46px rgba(4,12,28,.5),0 0 0 7px rgba(255,255,255,.07)}
+  border-radius:14px;border:1px solid rgba(255,255,255,.3);position:relative;
+  box-shadow:0 18px 46px rgba(4,12,28,.5),0 0 0 7px rgba(255,255,255,.07);
+  animation:rise 1.1s cubic-bezier(.22,1,.36,1) .25s both}
+/* «корона» — мягкое пульсирующее свечение за рамкой (приём scrolltide, 7s) */
+.hero-ph::before{content:"";position:absolute;inset:-30px;border-radius:34px;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(240,178,74,.38),rgba(240,178,74,0) 72%);
+  animation:corona 7s ease-in-out infinite}
+@keyframes corona{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.95;transform:scale(1.07)}}
 @media (min-width:901px){.hero .wrap{padding-right:calc(min(470px,36vw) + 56px)}}
 @media (max-width:900px){.hero-ph{display:none}}
+/* футер: светящаяся грань + появление при попадании в экран */
+footer{position:relative}
+footer::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,rgba(240,178,74,0),rgba(240,178,74,.5) 28%,rgba(240,178,74,.5) 72%,rgba(240,178,74,0))}
+footer .wrap{opacity:0;transform:translateY(22px);
+  transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+footer .wrap.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){footer .wrap{opacity:1;transform:none;transition:none}}
 .hero .anniv{display:inline-flex;align-items:center;gap:8px;margin:10px 0 0;padding:7px 14px;border-radius:999px;
   background:rgba(252,163,17,.16);border:1px solid rgba(252,163,17,.45);color:#ffd98a;font-weight:700;font-size:13.5px;
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .hero .anniv .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px rgba(252,163,17,.9);animation:pulse 2.2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
-@media (prefers-reduced-motion: reduce){.hero .bgimg{transform:none !important}}
+@media (prefers-reduced-motion: reduce){.hero .bgimg,.hero .wrap>*,.hero-ph img,.hero-ph::before{animation:none !important}
+  .hero .bgimg,.hero-ph{transform:none !important}}
 .wrap{max-width:1180px;margin:0 auto}
 .brandrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .brandrow .l{font-weight:800;font-size:22px}
@@ -1327,11 +1354,13 @@ def footer_html() -> str:
 /* параллакс обложки: scroll + лёгкий дрейф за мышью (десктоп) */
 (function(){
   var el = document.querySelector('.hero .bgimg');
+  var ph = document.querySelector('.hero-ph');
   if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var mx = 0, my = 0, sy = 0, raf = null, fine = window.matchMedia('(pointer: fine)').matches;
   function frame(){
     el.style.setProperty('--par', (sy * 0.28 + my) + 'px');
     el.style.setProperty('--pmx', mx + 'px');
+    if (ph) ph.style.setProperty('--parp', (sy * 0.12) + 'px');
     raf = null;
   }
   function queue(){ if (!raf) raf = requestAnimationFrame(frame); }
@@ -1355,6 +1384,18 @@ def footer_html() -> str:
       el.style.removeProperty('--mx'); el.style.removeProperty('--my');
     });
   });
+})();
+</script>
+<script>
+/* футер: появление при входе в viewport */
+(function(){
+  var w = document.querySelector('footer .wrap');
+  if (!w) return;
+  if (!('IntersectionObserver' in window)) { w.classList.add('in'); return; }
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .12 });
+  io.observe(w);
 })();
 </script>
 <footer>
