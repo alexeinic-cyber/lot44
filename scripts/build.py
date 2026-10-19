@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import sys
 import time
 from collections import Counter
@@ -41,6 +42,11 @@ from urllib.error import URLError, HTTPError
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 DATA = ROOT / "data"
+
+# Статичные ассеты обложки (копируются в site при каждой сборке)
+ASSETS = {
+    ROOT / "assets" / "ipatievsky-700.jpg": ("image/jpeg", 60 * 24 * 3600),
+}
 MSK = timezone(timedelta(hours=3))
 
 # --- API (публичный, без ключа) ---
@@ -377,6 +383,19 @@ CSS = """
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 a{color:inherit}
 .hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 22px 22px}
+/* юбилейная обложка: фото + параллакс */
+.hero{position:relative;overflow:hidden}
+.hero .bgimg{position:absolute;inset:-80px 0;background:url('assets/ipatievsky-700.jpg') center 32%/cover no-repeat;
+  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.08);z-index:0}
+.hero .bgshade{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(10,25,53,.72),rgba(10,25,53,.55) 45%,rgba(10,25,53,.88))}
+.hero .wrap{position:relative;z-index:2}
+.hero .anniv{display:inline-flex;align-items:center;gap:8px;margin:10px 0 0;padding:7px 14px;border-radius:999px;
+  background:rgba(252,163,17,.16);border:1px solid rgba(252,163,17,.45);color:#ffd98a;font-weight:700;font-size:13.5px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hero .anniv .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px rgba(252,163,17,.9);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+@media (prefers-reduced-motion: reduce){.hero .bgimg{transform:none !important}}
 .wrap{max-width:1180px;margin:0 auto}
 .brandrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .brandrow .l{font-weight:800;font-size:22px}
@@ -783,9 +802,11 @@ def render_torgi(lots: list[dict], updated: str) -> str:
 </head>
 <body>
 <header class="hero">
+  <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
   <div class="wrap">
     <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
       <span style="color:#9fb0d0;font-size:14px">агрегатор торгов</span></div>
+    <div class="anniv"><span class="dot"></span> Ипатьевскому монастырю — 700 лет · Кострома</div>
     <h1>Торги Костромской области — актуальные лоты</h1>
     <p>Продажа и аренда государственного и муниципального имущества, публичные предложения — одним списком.
        Данные: портал торгов <strong>torgi.gov.ru</strong>. Лоты-объекты культурного наследия отмечены значком <strong>ОКН</strong>,
@@ -1075,9 +1096,11 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
 </head>
 <body>
 <header class="hero">
+  <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
   <div class="wrap">
     <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
       <span style="color:#9fb0d0;font-size:14px">аналитика</span></div>
+    <div class="anniv"><span class="dot"></span> Ипатьевскому монастырю — 700 лет · Кострома</div>
     <h1>Аналитика торгов Костромской области</h1>
     <p>Сводная картина по активным лотам: структура рынка, география, сроки, ценовые сегменты
        и объекты культурного наследия. Данные: портал торгов <strong>torgi.gov.ru</strong>.</p>
@@ -1182,9 +1205,11 @@ def render_legislation(updated: str) -> str:
 </head>
 <body>
 <header class="hero">
+  <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
   <div class="wrap">
     <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
       <span style="color:#9fb0d0;font-size:14px">законодательство</span></div>
+    <div class="anniv"><span class="dot"></span> Ипатьевскому монастырю — 700 лет · Кострома</div>
     <h1>Законодательство: карта для новичка</h1>
     <p>Какие законы управляют имущественными торгами области — простыми словами, без юридического языка.
        Это карта, а не юридическая консультация: актуальные редакции ищите на официальных ресурсах.</p>
@@ -1289,6 +1314,25 @@ def render_legislation(updated: str) -> str:
 def footer_html() -> str:
     return """
 <script>
+/* параллакс обложки: scroll + лёгкий дрейф за мышью (десктоп) */
+(function(){
+  var el = document.querySelector('.hero .bgimg');
+  if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var mx = 0, my = 0, sy = 0, raf = null, fine = window.matchMedia('(pointer: fine)').matches;
+  function frame(){
+    el.style.setProperty('--par', (sy * 0.28 + my) + 'px');
+    el.style.setProperty('--pmx', mx + 'px');
+    raf = null;
+  }
+  function queue(){ if (!raf) raf = requestAnimationFrame(frame); }
+  addEventListener('scroll', function(){ sy = Math.min(scrollY, 600); queue(); }, { passive: true });
+  if (fine) addEventListener('pointermove', function(e){
+    mx = (e.clientX / innerWidth - .5) * 14; my = (e.clientY / innerHeight - .5) * 10; queue();
+  }, { passive: true });
+  queue();
+})();
+</script>
+<script>
 /* liquid glass: блик следует за курсором (только для .lq) */
 (function(){
   document.querySelectorAll('.lq, .chip').forEach(function(el){
@@ -1375,6 +1419,16 @@ def main() -> int:
     (SITE / "analytics.html").write_text(render_analytics(lots, objs, updated), encoding="utf-8")
     (SITE / "legislation.html").write_text(render_legislation(updated), encoding="utf-8")
     print(f"[ok] site/legislation.html (законы)")
+
+    # статичные ассеты (фото обложки)
+    assets_dir = SITE / "assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    for src, (_mime, _maxage) in ASSETS.items():
+        if src.exists():
+            shutil.copyfile(src, assets_dir / src.name)
+            print(f"[ok] assets/{src.name}")
+        else:
+            print(f"[warn] нет ассета: {src}", file=sys.stderr)
     n_photos = sum(1 for L in lots if L.get("img"))
     n_new = sum(1 for L in lots if L.get("is_new"))
     print(f"[ok] site/index.html ({len(lots)} lots, {n_photos} with photo, {n_new} new)")
