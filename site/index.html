@@ -14,13 +14,20 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 a{color:inherit}
 .hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 22px 22px}
-/* юбилейная обложка: фото + параллакс */
+/* юбилейная обложка: размытый амбиент-фон + фото монастыря целиком в рамке */
 .hero{position:relative;overflow:hidden}
-.hero .bgimg{position:absolute;inset:-80px 0;background:url('assets/ipatievsky-700.jpg') center 32%/cover no-repeat;
-  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.08);z-index:0}
+.hero .bgimg{position:absolute;inset:-90px 0;background:url('assets/ipatievsky-700.jpg') center 35%/cover no-repeat;
+  filter:blur(30px) saturate(1.05) brightness(.5);opacity:.55;
+  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.15);z-index:0}
 .hero .bgshade{position:absolute;inset:0;z-index:1;
-  background:linear-gradient(180deg,rgba(10,25,53,.72),rgba(10,25,53,.55) 45%,rgba(10,25,53,.88))}
+  background:linear-gradient(180deg,rgba(10,25,53,.78),rgba(10,25,53,.6) 45%,rgba(10,25,53,.9))}
 .hero .wrap{position:relative;z-index:2}
+.hero-ph{position:absolute;top:20px;bottom:20px;right:22px;z-index:2;display:flex;align-items:center;pointer-events:none}
+.hero-ph img{display:block;max-height:100%;max-width:min(470px,36vw);width:auto;height:auto;object-fit:contain;
+  border-radius:14px;border:1px solid rgba(255,255,255,.3);
+  box-shadow:0 18px 46px rgba(4,12,28,.5),0 0 0 7px rgba(255,255,255,.07)}
+@media (min-width:901px){.hero .wrap{padding-right:calc(min(470px,36vw) + 56px)}}
+@media (max-width:900px){.hero-ph{display:none}}
 .hero .anniv{display:inline-flex;align-items:center;gap:8px;margin:10px 0 0;padding:7px 14px;border-radius:999px;
   background:rgba(252,163,17,.16);border:1px solid rgba(252,163,17,.45);color:#ffd98a;font-weight:700;font-size:13.5px;
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -176,6 +183,7 @@ a.trow:hover{background:#f6f8fd}
 <body>
 <header class="hero">
   <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
+  <div class="hero-ph" aria-hidden="true"><img src="assets/ipatievsky-700.jpg" alt=""></div>
   <div class="wrap">
     <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
       <span style="color:#9fb0d0;font-size:14px">агрегатор торгов</span></div>
@@ -189,7 +197,7 @@ a.trow:hover{background:#f6f8fd}
       <a class="tab" href="analytics.html">Аналитика</a>
       <a class="tab" href="legislation.html">Законодательство</a>
     </div>
-    <div class="meta">Обновлено: 19.10.2026, 21:16 МСК · активных лотов: 319
+    <div class="meta">Обновлено: 19.10.2026, 21:38 МСК · активных лотов: 319
       (Аренда: 188 · Другое: 55 · Продажа: 76) · ОКН: 8 · новых: 15
       · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
   </div>
@@ -2459,21 +2467,6 @@ a.trow:hover{background:#f6f8fd}
     <span class="nn">№ 22000075430000000193 · лот 1</span>
   </div>
 </article>
-<article class="lot" data-card data-cat="Аренда" data-price="" data-dl="12" data-okn="" data-search="Земельный участок Земельный участок площадью 1014 кв.м., адрес: Костромская область, Судиславский район, д. Доманово, разрешенное использование: для ведения личного подсобного хозяйства (приусадебный земельный участок) № 22000075430000000193 · лот 3 22000075430000000193">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abe43c0ceb1b56e9200e5fc" alt="">
-  <div class="badges">
-    <span class="b deal-Аренда">Аренда</span>
-    <span class="b form">Сообщение о предоставлении (реализации)</span>
-  </div>
-  <h3>Земельный участок</h3>
-  <p class="snip">Земельный участок площадью 1014 кв.м., адрес: Костромская область, Судиславский район, д. Доманово, разрешенное использование: для ведения личного подсобного хозяйства (приусадебный земельный участок)</p>
-  <div><span class="price">—</span></div>
-  <div class="meta2"><span class="end">до 31.10.2026, 14:00 МСК</span><span class="timer" data-deadline="2026-10-31T14:00:00.000+00:00">осталось 12 дн.</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/22000075430000000193_3" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
-    <span class="nn">№ 22000075430000000193 · лот 3</span>
-  </div>
-</article>
 <article class="lot" data-card data-cat="Аренда" data-price="" data-dl="12" data-okn="" data-search="Земельный участок Земельный участок площадью 1032 кв.м., адрес: Костромская область, Судиславский район, д. Ратилово, разрешенное использование: для ведения личного подсобного хозяйства (приусадебный земельный участок) № 22000075430000000193 · лот 2 22000075430000000193">
   <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abe42c4c109631e138b57a5" alt="">
   <div class="badges">
@@ -2487,6 +2480,21 @@ a.trow:hover{background:#f6f8fd}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/22000075430000000193_2" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
     <span class="nn">№ 22000075430000000193 · лот 2</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Аренда" data-price="" data-dl="12" data-okn="" data-search="Земельный участок Земельный участок площадью 1014 кв.м., адрес: Костромская область, Судиславский район, д. Доманово, разрешенное использование: для ведения личного подсобного хозяйства (приусадебный земельный участок) № 22000075430000000193 · лот 3 22000075430000000193">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abe43c0ceb1b56e9200e5fc" alt="">
+  <div class="badges">
+    <span class="b deal-Аренда">Аренда</span>
+    <span class="b form">Сообщение о предоставлении (реализации)</span>
+  </div>
+  <h3>Земельный участок</h3>
+  <p class="snip">Земельный участок площадью 1014 кв.м., адрес: Костромская область, Судиславский район, д. Доманово, разрешенное использование: для ведения личного подсобного хозяйства (приусадебный земельный участок)</p>
+  <div><span class="price">—</span></div>
+  <div class="meta2"><span class="end">до 31.10.2026, 14:00 МСК</span><span class="timer" data-deadline="2026-10-31T14:00:00.000+00:00">осталось 12 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/22000075430000000193_3" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
+    <span class="nn">№ 22000075430000000193 · лот 3</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Аренда" data-price="270000" data-dl="13" data-okn="" data-search="Продажа земельного участка Костромская область, Мантуровский м.о., г Мантурово, ул. Луговая, д.1 № 22000022410000000064 · лот 1 22000022410000000064">
@@ -2759,21 +2767,6 @@ a.trow:hover{background:#f6f8fd}
     <span class="nn">№ 21000004310000003313 · лот 7</span>
   </div>
 </article>
-<article class="lot" data-card data-cat="Другое" data-price="137600" data-dl="15" data-okn="" data-search="1/2 доля в праве собственности на квартиру площадью 29,2 кв. м, кадастровый номер 44:14:090103:147. Правообладатель – Гробов Е.А. 1/2 доля в праве собственности на квартиру площадью 29,2 кв. м, кадастровый номер 44:14:090103:147, местонахождение: Костромская обл., Октябрьский р-н, с. Боговарово, ул. Кооперации, д. 7, кв. 1. Заре № 21000004310000003313 · лот 7 21000004310000003313">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abfb089f0ae127e196bf122" alt="">
-  <div class="badges">
-    <span class="b deal-Другое">Другое</span>
-    <span class="b form">Электронный аукцион</span>
-  </div>
-  <h3>1/2 доля в праве собственности на квартиру площадью 29,2 кв. м, кадастровый номер 44:14:090103:147. Правообладатель – Гробов Е.А.</h3>
-  <p class="snip">1/2 доля в праве собственности на квартиру площадью 29,2 кв. м, кадастровый номер 44:14:090103:147, местонахождение: Костромская обл., Октябрьский р-н, с. Боговарово, ул. Кооперации, д. 7, кв. 1. Заре</p>
-  <div><span class="price">137 600 ₽</span></div>
-  <div class="meta2"><span class="end">до 03.11.2026, 20:59 МСК</span><span class="timer" data-deadline="2026-11-03T20:59:00.000+00:00">осталось 15 дн.</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_7" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
-    <span class="nn">№ 21000004310000003313 · лот 7</span>
-  </div>
-</article>
 <article class="lot" data-card data-cat="Другое" data-price="266100" data-dl="15" data-okn="" data-search="1/2 доля в праве собственности на нежилое помещение (гаражный бокс) площадью 26,9 кв. м, кадастровый номер 44:32:020226:400 Правообладатель – Аюпов М.В. 1/2 доля в праве собственности на нежилое помещение (гаражный бокс) площадью 26,9 кв. м, кадастровый номер 44:32:020226:400, местонахождение: Костромская обл., г. Волгореченск, ГСК Строитель, бокс 157 № 21000004310000003313 · лот 13 21000004310000003313">
   <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abfb35cf0ae127e196bf41c" alt="">
   <div class="badges">
@@ -2787,6 +2780,21 @@ a.trow:hover{background:#f6f8fd}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_13" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
     <span class="nn">№ 21000004310000003313 · лот 13</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Другое" data-price="636000" data-dl="15" data-okn="" data-search="1/3 доли в праве собственности на квартиру площадью 35,7 кв. м, кадастровый номер 44:27:040226:150. Правообладатель – Брыгина А.В. 1/3 доли в праве собственности на квартиру площадью 35,7 кв. м, кадастровый номер 44:27:040226:150, местонахождение: Костромская обл., г. Кострома, ул. Красная Слобода, д. 22, кв. 4. Зарегистрирован о № 21000004310000003313 · лот 5 21000004310000003313">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abfaf72f72e2454efc66c16" alt="">
+  <div class="badges">
+    <span class="b deal-Другое">Другое</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>1/3 доли в праве собственности на квартиру площадью 35,7 кв. м, кадастровый номер 44:27:040226:150. Правообладатель – Брыгина А.В.</h3>
+  <p class="snip">1/3 доли в праве собственности на квартиру площадью 35,7 кв. м, кадастровый номер 44:27:040226:150, местонахождение: Костромская обл., г. Кострома, ул. Красная Слобода, д. 22, кв. 4. Зарегистрирован о</p>
+  <div><span class="price">636 000 ₽</span></div>
+  <div class="meta2"><span class="end">до 03.11.2026, 20:59 МСК</span><span class="timer" data-deadline="2026-11-03T20:59:00.000+00:00">осталось 15 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_5" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
+    <span class="nn">№ 21000004310000003313 · лот 5</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Другое" data-price="2280200" data-dl="15" data-okn="" data-search="1/3 доли в праве собственности на квартиру площадью 38,7 кв. м, кадастровый номер 44:27:040715:142. Правообладатель – Константинова Ю.В. 1/3 доли в праве собственности на квартиру площадью 38,7 кв. м, кадастровый номер 44:27:040715:142, местонахождение: Костромская обл., г. Кострома, ул. Осыпная, д. 1, кв. 71. Зарегистрирован один чело № 21000004310000003313 · лот 6 21000004310000003313">
@@ -2819,6 +2827,21 @@ a.trow:hover{background:#f6f8fd}
     <span class="nn">№ 21000004310000003313 · лот 10</span>
   </div>
 </article>
+<article class="lot" data-card data-cat="Другое" data-price="1221300" data-dl="15" data-okn="" data-search="Автомобиль Hyundai Solaris, 2021 года выпуска, государственный номер O825CO44, идентификационный номер (VIN) Z94K241CBMR289559, цвет белый.  Обременение – залог, залогодержатель –  Автомобиль Hyundai Solaris, 2021 года выпуска, государственный номер O825CO44, идентификационный номер (VIN) Z94K241CBMR289559, цвет белый. Согласно акта ареста имущество находится по адресу: Костромс № 21000004310000003313 · лот 22 21000004310000003313">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac357a4aaef1b53b659745b" alt="">
+  <div class="badges">
+    <span class="b deal-Другое">Другое</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Автомобиль Hyundai Solaris, 2021 года выпуска, государственный номер O825CO44, идентификационный номер (VIN) Z94K241CBMR289559, цвет белый.  Обременение – залог, залогодержатель – </h3>
+  <p class="snip">Автомобиль Hyundai Solaris, 2021 года выпуска, государственный номер O825CO44, идентификационный номер (VIN) Z94K241CBMR289559, цвет белый. Согласно акта ареста имущество находится по адресу: Костромс</p>
+  <div><span class="price">1 221 300 ₽</span></div>
+  <div class="meta2"><span class="end">до 03.11.2026, 20:59 МСК</span><span class="timer" data-deadline="2026-11-03T20:59:00.000+00:00">осталось 15 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_22" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
+    <span class="nn">№ 21000004310000003313 · лот 22</span>
+  </div>
+</article>
 <article class="lot" data-card data-cat="Другое" data-price="224000" data-dl="15" data-okn="" data-search="Автомобиль Hyundai Sonata, 2006 года выпуска, государственный номер У542KE44, идентификационный номер (VIN) X7MEM41HP6M018557, цвет бежевый.  Обременение – залог, залогодержатель – Автомобиль Hyundai Sonata, 2006 года выпуска, государственный номер У542KE44, идентификационный номер (VIN) X7MEM41HP6M018557, цвет бежевый. Согласно акта ареста имущество находится по адресу: Костром № 21000004310000003313 · лот 23 21000004310000003313">
   <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac3582fb460354f7d191115" alt="">
   <div class="badges">
@@ -2832,21 +2855,6 @@ a.trow:hover{background:#f6f8fd}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_23" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
     <span class="nn">№ 21000004310000003313 · лот 23</span>
-  </div>
-</article>
-<article class="lot" data-card data-cat="Другое" data-price="530100" data-dl="15" data-okn="" data-search="Автомобиль Renault Koleos, 2008 года выпуска, государственный номер O190PK44, идентификационный номер (VIN) VF1VY0C0VUC266012, цвет черный.  Правообладатель – Морозов Ю.А. Автомобиль Renault Koleos, 2008 года выпуска, государственный номер O190PK44, идентификационный номер (VIN) VF1VY0C0VUC266012, цвет черный. Согласно акта ареста имущество находится по адресу: Костромс № 21000004310000003313 · лот 20 21000004310000003313">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac35680f0ae127e196d913c" alt="">
-  <div class="badges">
-    <span class="b deal-Другое">Другое</span>
-    <span class="b form">Электронный аукцион</span>
-  </div>
-  <h3>Автомобиль Renault Koleos, 2008 года выпуска, государственный номер O190PK44, идентификационный номер (VIN) VF1VY0C0VUC266012, цвет черный.  Правообладатель – Морозов Ю.А.</h3>
-  <p class="snip">Автомобиль Renault Koleos, 2008 года выпуска, государственный номер O190PK44, идентификационный номер (VIN) VF1VY0C0VUC266012, цвет черный. Согласно акта ареста имущество находится по адресу: Костромс</p>
-  <div><span class="price">530 100 ₽</span></div>
-  <div class="meta2"><span class="end">до 03.11.2026, 20:59 МСК</span><span class="timer" data-deadline="2026-11-03T20:59:00.000+00:00">осталось 15 дн.</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_20" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
-    <span class="nn">№ 21000004310000003313 · лот 20</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Другое" data-price="530100" data-dl="15" data-okn="" data-search="Автомобиль Renault Koleos, 2008 года выпуска, государственный номер O190PK44, идентификационный номер (VIN) VF1VY0C0VUC266012, цвет черный.  Правообладатель – Морозов Ю.А. Автомобиль Renault Koleos, 2008 года выпуска, государственный номер O190PK44, идентификационный номер (VIN) VF1VY0C0VUC266012, цвет черный. Согласно акта ареста имущество находится по адресу: Костромс № 21000004310000003313 · лот 20 21000004310000003313">
@@ -2892,6 +2900,21 @@ a.trow:hover{background:#f6f8fd}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_19" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
     <span class="nn">№ 21000004310000003313 · лот 19</span>
+  </div>
+</article>
+<article class="lot" data-card data-cat="Другое" data-price="231000" data-dl="15" data-okn="" data-search="Земельный участок (н/п, ижс) площадью 600 кв. м, кадастровый номер 44:08:052601:927. Правообладатель – Иванов А.А. Земельный участок (н/п, ижс) площадью 600 кв. м, кадастровый номер 44:08:052601:927, местонахождение: Костромская обл., Красносельский р-н, д. Абрамово, уч. 142. Правообладатель – Иванов А.А. № 21000004310000003313 · лот 18 21000004310000003313">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ac35375f0ae127e196d8d02" alt="">
+  <div class="badges">
+    <span class="b deal-Другое">Другое</span>
+    <span class="b form">Электронный аукцион</span>
+  </div>
+  <h3>Земельный участок (н/п, ижс) площадью 600 кв. м, кадастровый номер 44:08:052601:927. Правообладатель – Иванов А.А.</h3>
+  <p class="snip">Земельный участок (н/п, ижс) площадью 600 кв. м, кадастровый номер 44:08:052601:927, местонахождение: Костромская обл., Красносельский р-н, д. Абрамово, уч. 142. Правообладатель – Иванов А.А.</p>
+  <div><span class="price">231 000 ₽</span></div>
+  <div class="meta2"><span class="end">до 03.11.2026, 20:59 МСК</span><span class="timer" data-deadline="2026-11-03T20:59:00.000+00:00">осталось 15 дн.</span></div>
+  <div class="foot">
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_18" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
+    <span class="nn">№ 21000004310000003313 · лот 18</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Другое" data-price="564000" data-dl="15" data-okn="" data-search="Земельный участок (с/н, с/х пр-во) площадью 1038 кв. м, кадастровый номер 44:08:021702:424. Правообладатель – Власова О.А. Земельный участок (с/н, с/х пр-во) площадью 1038 кв. м, кадастровый номер 44:08:021702:424, местонахождение: Костромская обл., Красносельский р-н, в 1003 м на запад от омз-132. Правообладатель – Власо № 21000004310000003313 · лот 15 21000004310000003313">
@@ -2984,19 +3007,19 @@ a.trow:hover{background:#f6f8fd}
     <span class="nn">№ 21000004310000003313 · лот 1</span>
   </div>
 </article>
-<article class="lot" data-card data-cat="Другое" data-price="366200" data-dl="15" data-okn="" data-search="Квартира площадью 34,2 кв. м, кадастровый номер 44:28:020211:298. Правообладатель – Яшкова Е.В. Квартира площадью 34,2 кв. м, кадастровый номер 44:28:020211:298, местонахождение: Костромская обл., г. Мантурово, ул. Ленина, д. 8, кв. 401. Зарегистрированы пять человек. Дом в программу капитальног № 21000004310000003313 · лот 1 21000004310000003313">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abfa9dbc109631e138cae76" alt="">
+<article class="lot" data-card data-cat="Другое" data-price="624000" data-dl="15" data-okn="" data-search="Квартира площадью 36 кв. м, кадастровый номер 44:28:010135:223. Правообладатель – Красоткин Е.Р Квартира площадью 36 кв. м, кадастровый номер 44:28:010135:223, местонахождение: Костромская обл., г. Мантурово, ул. Советская, д. 34в, кв. 4. Зарегистрирован один человек. Задолженность по взносам на № 21000004310000003313 · лот 9 21000004310000003313">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abfb18af0ae127e196bf21e" alt="">
   <div class="badges">
     <span class="b deal-Другое">Другое</span>
     <span class="b form">Электронный аукцион</span>
   </div>
-  <h3>Квартира площадью 34,2 кв. м, кадастровый номер 44:28:020211:298. Правообладатель – Яшкова Е.В.</h3>
-  <p class="snip">Квартира площадью 34,2 кв. м, кадастровый номер 44:28:020211:298, местонахождение: Костромская обл., г. Мантурово, ул. Ленина, д. 8, кв. 401. Зарегистрированы пять человек. Дом в программу капитальног</p>
-  <div><span class="price">366 200 ₽</span></div>
+  <h3>Квартира площадью 36 кв. м, кадастровый номер 44:28:010135:223. Правообладатель – Красоткин Е.Р</h3>
+  <p class="snip">Квартира площадью 36 кв. м, кадастровый номер 44:28:010135:223, местонахождение: Костромская обл., г. Мантурово, ул. Советская, д. 34в, кв. 4. Зарегистрирован один человек. Задолженность по взносам на</p>
+  <div><span class="price">624 000 ₽</span></div>
   <div class="meta2"><span class="end">до 03.11.2026, 20:59 МСК</span><span class="timer" data-deadline="2026-11-03T20:59:00.000+00:00">осталось 15 дн.</span></div>
   <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_1" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
-    <span class="nn">№ 21000004310000003313 · лот 1</span>
+    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_9" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
+    <span class="nn">№ 21000004310000003313 · лот 9</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Другое" data-price="367000" data-dl="15" data-okn="" data-search="Квартира площадью 40,5 кв. м, кадастровый номер 44:03:020108:188. Правообладатель – Карлов А.Б. Квартира площадью 40,5 кв. м, кадастровый номер 44:03:020108:188, местонахождение: Костромская обл., Вохомский р-н, п. Воробьевица, ул. Строительная, д. 38, кв. 4. Зарегистрированы два человека. Дом в № 21000004310000003313 · лот 4 21000004310000003313">
@@ -3012,21 +3035,6 @@ a.trow:hover{background:#f6f8fd}
   <div class="foot">
     <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_4" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
     <span class="nn">№ 21000004310000003313 · лот 4</span>
-  </div>
-</article>
-<article class="lot" data-card data-cat="Другое" data-price="753000" data-dl="15" data-okn="" data-search="Комната площадью 24,1 кв. м, кадастровый номер 44:25:030207:98. Правообладатель – Готовцева Л.Б. Комната площадью 24,1 кв. м, кадастровый номер 44:25:030207:981, местонахождение: Костромская обл., г. Буй, ул. Красной Армии, д. 8, кв. 10, ком. 9. Никто не зарегистрирован. Задолженность по взносам  № 21000004310000003313 · лот 2 21000004310000003313">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6abfaa64ceb1b56e92023cb6" alt="">
-  <div class="badges">
-    <span class="b deal-Другое">Другое</span>
-    <span class="b form">Электронный аукцион</span>
-  </div>
-  <h3>Комната площадью 24,1 кв. м, кадастровый номер 44:25:030207:98. Правообладатель – Готовцева Л.Б.</h3>
-  <p class="snip">Комната площадью 24,1 кв. м, кадастровый номер 44:25:030207:981, местонахождение: Костромская обл., г. Буй, ул. Красной Армии, д. 8, кв. 10, ком. 9. Никто не зарегистрирован. Задолженность по взносам </p>
-  <div><span class="price">753 000 ₽</span></div>
-  <div class="meta2"><span class="end">до 03.11.2026, 20:59 МСК</span><span class="timer" data-deadline="2026-11-03T20:59:00.000+00:00">осталось 15 дн.</span></div>
-  <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/21000004310000003313_2" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
-    <span class="nn">№ 21000004310000003313 · лот 2</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Другое" data-price="753000" data-dl="15" data-okn="" data-search="Комната площадью 24,1 кв. м, кадастровый номер 44:25:030207:98. Правообладатель – Готовцева Л.Б. Комната площадью 24,1 кв. м, кадастровый номер 44:25:030207:981, местонахождение: Костромская обл., г. Буй, ул. Красной Армии, д. 8, кв. 10, ком. 9. Никто не зарегистрирован. Задолженность по взносам  № 21000004310000003313 · лот 2 21000004310000003313">
@@ -4589,19 +4597,19 @@ a.trow:hover{background:#f6f8fd}
     <span class="nn">№ 22000003460000000122 · лот 1</span>
   </div>
 </article>
-<article class="lot" data-card data-cat="Продажа" data-price="188000" data-dl="28" data-okn="" data-search="Помещение № 14а Нежилое помещение, площадью 12,3 кв.м. на первом этаже жилого дома, кадастровый номер 44:28:020247:148, кадастровая стоимость 231755,00 руб. № 22000022410000000066 · лот 5 22000022410000000066">
-  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ad5c3a32967cf5fa599ef24" alt="">
+<article class="lot" data-card data-cat="Продажа" data-price="1835000" data-dl="28" data-okn="" data-search="Нежилые помещения:, № 1 гараж, площадью 130,4 кв.м.; № 2 гараж, площадью 160,4 кв. м.; № 3 гараж, площадью 127,4 кв. м.; № 4 комната механика, площадью 31 кв. м.;  № 5 нежилое поме Нежилые помещения:, № 1 гараж, площадью 130,4 кв.м., кадастровый номер 44:28:010138:106, кадастровая стоимость 408848,34 руб. № 2 гараж, площадью 160,4 кв. м., кадастровым номером 44:28:010138:107, ка № 22000022410000000066 · лот 1 22000022410000000066">
+  <img class="photo" loading="lazy" decoding="async" referrerpolicy="no-referrer" src="https://torgi.gov.ru/new/file-store/v1/6ad5ae022967cf5fa599cbbd" alt="">
   <div class="badges">
     <span class="b new" title="Опубликован недавно">новый</span><span class="b deal-Продажа">Продажа</span>
     <span class="b form">Электронный аукцион</span>
   </div>
-  <h3>Помещение № 14а</h3>
-  <p class="snip">Нежилое помещение, площадью 12,3 кв.м. на первом этаже жилого дома, кадастровый номер 44:28:020247:148, кадастровая стоимость 231755,00 руб.</p>
-  <div><span class="price">188 000 ₽</span></div>
+  <h3>Нежилые помещения:, № 1 гараж, площадью 130,4 кв.м.; № 2 гараж, площадью 160,4 кв. м.; № 3 гараж, площадью 127,4 кв. м.; № 4 комната механика, площадью 31 кв. м.;  № 5 нежилое поме</h3>
+  <p class="snip">Нежилые помещения:, № 1 гараж, площадью 130,4 кв.м., кадастровый номер 44:28:010138:106, кадастровая стоимость 408848,34 руб. № 2 гараж, площадью 160,4 кв. м., кадастровым номером 44:28:010138:107, ка</p>
+  <div><span class="price">1 835 000 ₽</span></div>
   <div class="meta2"><span class="end">до 16.11.2026, 13:00 МСК</span><span class="timer" data-deadline="2026-11-16T13:00:00.000+00:00">осталось 28 дн.</span></div>
   <div class="foot">
-    <a href="https://torgi.gov.ru/new/public/lots/lot/22000022410000000066_5" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
-    <span class="nn">№ 22000022410000000066 · лот 5</span>
+    <a href="https://torgi.gov.ru/new/public/lots/lot/22000022410000000066_1" target="_blank" rel="noopener" class="lq">Портал торгов ↗</a>
+    <span class="nn">№ 22000022410000000066 · лот 1</span>
   </div>
 </article>
 <article class="lot" data-card data-cat="Продажа" data-price="188000" data-dl="28" data-okn="" data-search="Помещение № 14а Нежилое помещение, площадью 12,3 кв.м. на первом этаже жилого дома, кадастровый номер 44:28:020247:148, кадастровая стоимость 231755,00 руб. № 22000022410000000066 · лот 5 22000022410000000066">
