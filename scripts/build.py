@@ -383,13 +383,20 @@ CSS = """
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 a{color:inherit}
 .hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 22px 22px}
-/* юбилейная обложка: фото + параллакс */
+/* юбилейная обложка: размытый амбиент-фон + фото монастыря целиком в рамке */
 .hero{position:relative;overflow:hidden}
-.hero .bgimg{position:absolute;inset:-80px 0;background:url('assets/ipatievsky-700.jpg') center 32%/cover no-repeat;
-  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.08);z-index:0}
+.hero .bgimg{position:absolute;inset:-90px 0;background:url('assets/ipatievsky-700.jpg') center 35%/cover no-repeat;
+  filter:blur(30px) saturate(1.05) brightness(.5);opacity:.55;
+  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.15);z-index:0}
 .hero .bgshade{position:absolute;inset:0;z-index:1;
-  background:linear-gradient(180deg,rgba(10,25,53,.72),rgba(10,25,53,.55) 45%,rgba(10,25,53,.88))}
+  background:linear-gradient(180deg,rgba(10,25,53,.78),rgba(10,25,53,.6) 45%,rgba(10,25,53,.9))}
 .hero .wrap{position:relative;z-index:2}
+.hero-ph{position:absolute;top:20px;bottom:20px;right:22px;z-index:2;display:flex;align-items:center;pointer-events:none}
+.hero-ph img{display:block;max-height:100%;max-width:min(470px,36vw);width:auto;height:auto;object-fit:contain;
+  border-radius:14px;border:1px solid rgba(255,255,255,.3);
+  box-shadow:0 18px 46px rgba(4,12,28,.5),0 0 0 7px rgba(255,255,255,.07)}
+@media (min-width:901px){.hero .wrap{padding-right:calc(min(470px,36vw) + 56px)}}
+@media (max-width:900px){.hero-ph{display:none}}
 .hero .anniv{display:inline-flex;align-items:center;gap:8px;margin:10px 0 0;padding:7px 14px;border-radius:999px;
   background:rgba(252,163,17,.16);border:1px solid rgba(252,163,17,.45);color:#ffd98a;font-weight:700;font-size:13.5px;
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -803,6 +810,7 @@ def render_torgi(lots: list[dict], updated: str) -> str:
 <body>
 <header class="hero">
   <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
+  <div class="hero-ph" aria-hidden="true"><img src="assets/ipatievsky-700.jpg" alt=""></div>
   <div class="wrap">
     <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
       <span style="color:#9fb0d0;font-size:14px">агрегатор торгов</span></div>
@@ -1097,6 +1105,7 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
 <body>
 <header class="hero">
   <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
+  <div class="hero-ph" aria-hidden="true"><img src="assets/ipatievsky-700.jpg" alt=""></div>
   <div class="wrap">
     <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
       <span style="color:#9fb0d0;font-size:14px">аналитика</span></div>
@@ -1206,6 +1215,7 @@ def render_legislation(updated: str) -> str:
 <body>
 <header class="hero">
   <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
+  <div class="hero-ph" aria-hidden="true"><img src="assets/ipatievsky-700.jpg" alt=""></div>
   <div class="wrap">
     <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
       <span style="color:#9fb0d0;font-size:14px">законодательство</span></div>
