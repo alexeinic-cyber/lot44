@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Объекты культурного наследия Костромской области | ЛОТ 44</title>
+<meta name="description" content="Реестр объектов культурного наследия Костромской области на платформе «Наследие» ДОМ.РФ: статусы охраны, названия, ссылки на карточки.">
+<style>
+:root{
+  --navy:#14213D; --navy2:#1F2F55; --amber:#FCA311; --bg:#f2f4f8; --card:#fff;
+  --ink:#1c1e21; --muted:#6b7280; --line:#e5e7eb; --green:#047857; --blue:#1d4ed8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:inherit}
+.hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 22px 22px}
+/* юбилейная обложка: монастырь во всю площадь (full-bleed), текст поверх градиента */
+.hero{position:relative;overflow:hidden;min-height:clamp(420px,56vh,580px);display:flex;flex-direction:column;justify-content:center;padding:40px 22px 34px}
+.hero .bgimg{position:absolute;inset:-140px -20px;background:url('assets/ipatievsky-700.jpg') center 68%/cover no-repeat;
+  will-change:transform;transform:translate3d(var(--pmx,0px),var(--par,0px),0) scale(1.06);z-index:0;
+  animation:bgdrift 30s ease-in-out infinite alternate}
+@keyframes bgdrift{from{transform:translate3d(var(--pmx,0px),calc(var(--par,0px) - 6px),0) scale(1.06)}
+  to{transform:translate3d(calc(var(--pmx,0px) + 9px),calc(var(--par,0px) + 6px),0) scale(1.09)}}
+.hero .bgshade{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(90deg,rgba(10,25,53,.86) 0%,rgba(10,25,53,.6) 40%,rgba(10,25,53,.16) 72%,rgba(10,25,53,.24) 100%),
+             linear-gradient(180deg,rgba(10,25,53,.5) 0%,rgba(10,25,53,.08) 42%,rgba(10,25,53,.72) 100%)}
+.hero .wrap{position:relative;z-index:2}
+.hero h1,.hero p,.hero .meta,.hero .brandrow{text-shadow:0 1px 16px rgba(6,14,30,.6),0 1px 3px rgba(6,14,30,.5)}
+/* каскадное появление (в духе scrolltide): экспо-изинг */
+.hero .wrap>*{animation:rise .9s cubic-bezier(.22,1,.36,1) both}
+.hero .wrap>.anniv{animation-delay:.1s}
+.hero .wrap>h1{animation-delay:.18s}
+.hero .wrap>p{animation-delay:.28s}
+.hero .wrap>.tabs{animation-delay:.38s}
+.hero .wrap>.meta{animation-delay:.48s}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+/* футер: светящаяся грань + появление при попадании в экран */
+footer{position:relative}
+footer::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,rgba(240,178,74,0),rgba(240,178,74,.5) 28%,rgba(240,178,74,.5) 72%,rgba(240,178,74,0))}
+footer .wrap{opacity:0;transform:translateY(22px);
+  transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+footer .wrap.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){footer .wrap{opacity:1;transform:none;transition:none}}
+.hero .anniv{display:inline-flex;align-items:center;gap:8px;margin:10px 0 0;padding:7px 14px;border-radius:999px;
+  background:rgba(252,163,17,.16);border:1px solid rgba(252,163,17,.45);color:#ffd98a;font-weight:700;font-size:13.5px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hero .anniv .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px rgba(252,163,17,.9);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+@media (prefers-reduced-motion: reduce){.hero .bgimg,.hero .wrap>*{animation:none !important}
+  .hero .bgimg{transform:none !important}}
+.wrap{max-width:1180px;margin:0 auto}
+.brandrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brandrow .l{font-weight:800;font-size:22px}
+.brandrow .l .n{color:var(--amber)}
+.hero h1{margin:10px 0 6px;font-size:26px;line-height:1.25}
+.hero p{margin:0;color:#c8d3ea;font-size:14.5px}
+.meta{margin-top:12px;font-size:13px;color:#9fb0d0}
+.meta a{color:#FCA311;font-weight:700}
+.controls{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);
+          padding:12px 22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.controls input[type=search]{flex:1 1 260px;min-width:200px;padding:10px 14px;border:1px solid var(--line);
+          border-radius:10px;font-size:14.5px;outline:none}
+.controls input[type=search]:focus{border-color:var(--amber)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid rgba(20,33,61,.14);background:rgba(255,255,255,.65);border-radius:999px;padding:7px 14px;font-size:13.5px;
+      cursor:pointer;font-weight:600;color:#374151;
+      position:relative;overflow:hidden;
+      backdrop-filter:blur(8px) saturate(1.15);-webkit-backdrop-filter:blur(8px) saturate(1.15);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 2px rgba(20,33,61,.06),0 2px 6px rgba(20,33,61,.08);
+      transition:transform .16s ease, box-shadow .16s ease, background .16s ease}
+.chip::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+      background:radial-gradient(140px 60px at var(--mx,50%) var(--my,-20%),rgba(252,163,17,.18),rgba(255,255,255,0) 65%);
+      opacity:0;transition:opacity .2s ease}
+.chip:hover::before{opacity:1}
+.chip:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 6px 14px rgba(20,33,61,.14)}
+.chip:active{transform:scale(.96)}
+.chip.on{background:var(--amber);border-color:var(--amber);color:var(--navy);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 4px 12px rgba(252,163,17,.35)}
+.chip.on::before{display:none}
+.count{font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}
+main{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.lot,.obj{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;
+          display:flex;flex-direction:column;gap:10px}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.b{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#eef2ff;color:#1d4ed8}
+.b.deal-Продажа{background:#dcfce7;color:#047857}
+.b.deal-Аренда{background:#dbeafe;color:#1d4ed8}
+.b.deal-Другое{background:#f3f4f6;color:#4b5563}
+.b.form{background:#f3f4f6;color:#374151}
+.b.okn{background:var(--amber);color:var(--navy)}
+.b.new{background:#d1fae5;color:#047857}
+.lot .photo{width:100%;height:170px;object-fit:cover;border-radius:10px;display:block;background:#eef1f6}
+.lot.over{opacity:.72}
+.timer{color:var(--muted)}
+.timer.urgent{color:#b45309;font-weight:700}
+.timer.crit{color:#dc2626;font-weight:800}
+.timer.over{color:#9ca3af}
+.pslide{display:flex;flex-direction:column;gap:4px;flex:0 1 240px;min-width:210px}
+.pslide .ps-label{font-size:12.5px;color:var(--muted)}
+.pslide .ps-label b{color:var(--ink)}
+.ps-track{position:relative;height:24px}
+.ps-track input[type=range]{position:absolute;left:0;top:0;width:100%;height:24px;margin:0;background:transparent;
+  -webkit-appearance:none;appearance:none;pointer-events:none}
+.ps-track input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;background:var(--amber);border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(20,33,61,.35);cursor:pointer}
+.ps-track input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;
+  background:var(--amber);border:2px solid #fff;box-shadow:0 1px 4px rgba(20,33,61,.35);cursor:pointer}
+.ps-track::before{content:"";position:absolute;left:2px;right:2px;top:11px;height:3px;border-radius:2px;background:var(--line)}
+h3{margin:0;font-size:16px;line-height:1.35}
+.snip{margin:0;color:var(--muted);font-size:13.5px}
+.price{font-weight:800;font-size:18px;color:var(--navy)}
+.meta2{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.meta2 .urgent{color:#b45309;font-weight:700}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;margin-top:auto}
+.foot a{color:var(--blue);font-weight:600;text-decoration:none}
+.nn{color:var(--muted);font-size:12px}
+.empty{text-align:center;padding:48px;color:var(--muted)}
+footer{background:var(--navy);color:#9fb0d0;padding:28px 22px;margin-top:40px;font-size:13px;line-height:1.6}
+footer a{color:#FCA311;font-weight:700}
+footer .brand{color:#fff;font-weight:800;margin-bottom:8px;font-size:16px}
+footer .brand span{color:var(--amber)}
+.tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tab{display:inline-block;padding:7px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
+     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#eaf1ff;text-decoration:none}
+.tab.on{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+/* liquid glass pill (лёгкий, без JS-блика для .tab) */
+.tab{position:relative;overflow:hidden;backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);
+     box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 1px rgba(0,0,0,.18),0 6px 16px rgba(0,0,0,.20);
+     transition:transform .18s ease, box-shadow .18s ease, background .18s ease}
+.tab::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+     background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%)}
+.tab:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 10px 22px rgba(0,0,0,.28)}
+.tab:active{transform:translateY(0) scale(.98)}
+.tab.on{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 18px rgba(252,163,17,.35)}
+/* liquid glass c курсорным бликом (кнопки на карточках) */
+.lq{position:relative;overflow:hidden;border-radius:999px;
+    backdrop-filter:blur(12px) saturate(1.25);-webkit-backdrop-filter:blur(12px) saturate(1.25);
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.20),inset 0 -1px 1px rgba(0,0,0,.16),0 6px 14px rgba(0,0,0,.12);
+    transition:transform .16s ease, box-shadow .16s ease, background .16s ease}
+.lq::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+    background:radial-gradient(180px 100px at var(--mx,50%) var(--my,0%),rgba(255,255,255,.35),rgba(255,255,255,0) 60%)}
+.lq:hover{transform:translateY(-1px);background:rgba(255,255,255,.16)}
+.lq:active{transform:scale(.97)}
+.foot a.lq{color:var(--navy);font-weight:700;text-decoration:none;padding:7px 14px;font-size:13px;display:inline-block}
+.foot a.lq:hover{color:var(--navy)}
+.dash{max-width:1180px;margin:0 auto;padding:18px 22px 40px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.insights{display:flex;flex-direction:column;gap:8px}
+.insight{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14.5px}
+.ins-ico{flex:0 0 auto;font-size:18px;line-height:1.4}
+.ins-txt{color:var(--ink)}
+.ins-txt b{color:var(--navy)}
+.kpi-v{font-size:23px;font-weight:800;color:var(--navy);line-height:1.15}
+.kpi-t{font-size:12.5px;color:var(--muted);margin-top:4px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.heat-modes{display:flex;gap:8px;margin:2px 0 12px}
+.heat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:8px}
+.heat-tile{border:1px solid rgba(20,33,61,.10);border-radius:10px;padding:10px 12px;min-height:62px;display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+.ht-name{font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.25}
+.ht-val{font-size:19px;font-weight:800;color:var(--navy)}
+.dash-grid .wide{grid-column:1/-1}
+.dash-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+           display:flex;flex-direction:column;gap:10px}
+.dash-title{font-weight:800;font-size:15.5px;color:var(--ink)}
+.dash-sub{color:var(--muted);font-size:12.5px;margin-top:-6px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;font-size:13px}
+.bar-label{color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{background:#eef1f6;border-radius:6px;height:16px;overflow:hidden}
+.bar-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#FCA311,#ffc766)}
+.bar-fill.bluefill{background:linear-gradient(90deg,#1d4ed8,#6d9bf1)}
+.bar-fill.greenfill{background:linear-gradient(90deg,#047857,#4bc09a)}
+.bar-val{text-align:right;font-weight:700;color:var(--ink)}
+.stack{display:flex;height:22px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.seg{display:block;height:100%}
+.seg-sale{background:#047857}.seg-rent{background:#1d4ed8}.seg-other{background:#9ca3af}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:#374151}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.legend .li-sale{background:#047857}.legend .li-rent{background:#1d4ed8}.legend .li-other{background:#9ca3af}
+.tlist{display:flex;flex-direction:column;gap:2px}
+a.trow{display:flex;gap:10px;align-items:baseline;font-size:13.5px;color:inherit;text-decoration:none;
+       padding:7px 6px;border-bottom:1px dashed var(--line);border-radius:8px}
+a.trow:last-child{border-bottom:none}
+a.trow:hover{background:#f6f8fd}
+.trow .num{color:var(--muted);min-width:22px;font-weight:700}
+.trow .nm{flex:1;overflow:hidden}
+.trow .pr{font-weight:800;white-space:nowrap;color:var(--navy)}
+.trow .dl{color:var(--muted);white-space:nowrap;font-size:12.5px}
+.hint{font-size:12.5px;color:var(--muted)}
+@media(max-width:600px){.hero h1{font-size:22px}.grid{grid-template-columns:1fr}.pslide{flex:1 1 100%;min-width:0}
+  .bar-row{grid-template-columns:104px 1fr 44px}.dash-grid{grid-template-columns:1fr}}
+
+.obj .oname{font-weight:700;font-size:15px;line-height:1.35}
+.obj .b.st{background:#fef3c7;color:#92400e}
+.obj .oid{font-size:13px;color:var(--blue);text-decoration:none;font-weight:600}
+.obj .oid:hover{text-decoration:underline}
+#hcount{font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
+      <span style="color:#9fb0d0;font-size:14px">наследие</span></div>
+    <div class="anniv"><span class="dot"></span> Ипатьевскому монастырю — 700 лет · Кострома</div>
+    <h1>Объекты культурного наследия области</h1>
+    <p>Реестр объектов культурного наследия Костромской области по данным платформы
+       <strong>«Наследие» ДОМ.РФ</strong>: что уже под охраной и с каким статусом.
+       Для инвесторов — ориентир: такие объекты требуют охранного обязательства по 73-ФЗ.</p>
+    <div class="tabs">
+      <a class="tab" href="index.html">Торги</a>
+      <a class="tab" href="analytics.html">Аналитика</a>
+      <span class="tab on">Наследие</span>
+      <a class="tab" href="legislation.html">Законодательство</a>
+    </div>
+    <div class="meta">Обновлено: 25.10.2026, 20:21 МСК · объектов в реестре: 115
+      · источник: <a href="https://наследие.культура.рф" target="_blank" rel="noopener">наследие.культура.рф</a></div>
+  </div>
+</header>
+<div class="controls">
+  <div class="chips" id="hchips"><button type="button" class="chip on" data-st="Подготовка к торгам">Подготовка к торгам · 40</button><button type="button" class="chip" data-st="Решение отсутствует">Решение отсутствует · 33</button><button type="button" class="chip" data-st="Инвестор найден">Инвестор найден · 27</button><button type="button" class="chip" data-st="Конкурс объявлен">Конкурс объявлен · 15</button></div>
+  <span class="count" id="hcount">Показано: 115 из 115</span>
+</div>
+<main>
+  <div class="grid" id="hgrid"><div class="obj" data-st="Инвестор найден"><div class="oname">Барский особняк</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2374" target="_blank" rel="noopener">карточка №2374 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Врачебный корпус</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2375" target="_blank" rel="noopener">карточка №2375 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Главная контора колокололитейного завода С.Н.Забенкина</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4033" target="_blank" rel="noopener">карточка №4033 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Городское училище</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3516" target="_blank" rel="noopener">карточка №3516 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом Калашникова</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3020" target="_blank" rel="noopener">карточка №3020 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом Кондакова</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4275" target="_blank" rel="noopener">карточка №4275 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом Училища слепых</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3219" target="_blank" rel="noopener">карточка №3219 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4627" target="_blank" rel="noopener">карточка №4627 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3521" target="_blank" rel="noopener">карточка №3521 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2929" target="_blank" rel="noopener">карточка №2929 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3512" target="_blank" rel="noopener">карточка №3512 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2835" target="_blank" rel="noopener">карточка №2835 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1661" target="_blank" rel="noopener">карточка №1661 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2789" target="_blank" rel="noopener">карточка №2789 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом жилой Ознобихина Ф.М. (Третьякова И.П.)</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2850" target="_blank" rel="noopener">карточка №2850 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Дом управляющего</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2367" target="_blank" rel="noopener">карточка №2367 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Доходный дом</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2836" target="_blank" rel="noopener">карточка №2836 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Жилой дом XVIII в.</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3525" target="_blank" rel="noopener">карточка №3525 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Жилой дом, где находился уездный комитет РКП(б)</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3218" target="_blank" rel="noopener">карточка №3218 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Здание провиантского магазина, где располагалась типография, выпустившая  1-й номер районной газеты «Крестьянская правда»</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2378" target="_blank" rel="noopener">карточка №2378 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Земская больница</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4626" target="_blank" rel="noopener">карточка №4626 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Конюшня</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1654" target="_blank" rel="noopener">карточка №1654 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Корпус стационара № 1</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3751" target="_blank" rel="noopener">карточка №3751 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Корпус стационара № 2</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2376" target="_blank" rel="noopener">карточка №2376 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Пищеблок</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2377" target="_blank" rel="noopener">карточка №2377 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Флигель</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/8195" target="_blank" rel="noopener">карточка №8195 ↗</a></div><div class="obj" data-st="Инвестор найден"><div class="oname">Хозпостройка и конюшня</div><div class="badges"><span class="b st">Инвестор найден</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2753" target="_blank" rel="noopener">карточка №2753 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Ансамбль женской гимназии</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4628" target="_blank" rel="noopener">карточка №4628 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Волостное правление</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3228" target="_blank" rel="noopener">карточка №3228 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Главный дом усадьбы Бартеневых</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1672" target="_blank" rel="noopener">карточка №1672 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом Сыромятниковых</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3524" target="_blank" rel="noopener">карточка №3524 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/8626" target="_blank" rel="noopener">карточка №8626 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/8627" target="_blank" rel="noopener">карточка №8627 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом жилой Киселева</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1562" target="_blank" rel="noopener">карточка №1562 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом жилой Крутикова В.Д.</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3522" target="_blank" rel="noopener">карточка №3522 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом жилой Полозовых</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1796" target="_blank" rel="noopener">карточка №1796 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом жилой с лавкой</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4685" target="_blank" rel="noopener">карточка №4685 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Дом торговый Пащенина (Пащинина)</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3752" target="_blank" rel="noopener">карточка №3752 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Здание женской гимназии. Здесь была создана первая комсомольская ячейка</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4494" target="_blank" rel="noopener">карточка №4494 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Торговая палатка</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4623" target="_blank" rel="noopener">карточка №4623 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Усадьба «Неверово»</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4639" target="_blank" rel="noopener">карточка №4639 ↗</a></div><div class="obj" data-st="Конкурс объявлен"><div class="oname">Флигель</div><div class="badges"><span class="b st">Конкурс объявлен</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4495" target="_blank" rel="noopener">карточка №4495 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Богадельня</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2308" target="_blank" rel="noopener">карточка №2308 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Бывший магазин Нарышкина</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2364" target="_blank" rel="noopener">карточка №2364 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Водонапорная башня</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4682" target="_blank" rel="noopener">карточка №4682 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Главный дом</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4643" target="_blank" rel="noopener">карточка №4643 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Главный дом</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4754" target="_blank" rel="noopener">карточка №4754 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Главный дом дворянской усадьбы «Горка»</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2928" target="_blank" rel="noopener">карточка №2928 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом Ашастина (полотняная мануфактура)</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1747" target="_blank" rel="noopener">карточка №1747 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом М.И.Шабарова</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2356" target="_blank" rel="noopener">карточка №2356 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом Юдина</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3518" target="_blank" rel="noopener">карточка №3518 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4677" target="_blank" rel="noopener">карточка №4677 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4688" target="_blank" rel="noopener">карточка №4688 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3220" target="_blank" rel="noopener">карточка №3220 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3511" target="_blank" rel="noopener">карточка №3511 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4276" target="_blank" rel="noopener">карточка №4276 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1637" target="_blank" rel="noopener">карточка №1637 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4272" target="_blank" rel="noopener">карточка №4272 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2379" target="_blank" rel="noopener">карточка №2379 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3509" target="_blank" rel="noopener">карточка №3509 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой Баркевича</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3513" target="_blank" rel="noopener">карточка №3513 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой Баркевича</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4274" target="_blank" rel="noopener">карточка №4274 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой Бедаревых</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4504" target="_blank" rel="noopener">карточка №4504 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой Бушуева</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2370" target="_blank" rel="noopener">карточка №2370 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой Мешалина</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4637" target="_blank" rel="noopener">карточка №4637 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом жилой купцов Бояриновых</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1810" target="_blank" rel="noopener">карточка №1810 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом при детском приюте</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4493" target="_blank" rel="noopener">карточка №4493 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Дом, в котором родился и жил писатель Максимов С.В.</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4278" target="_blank" rel="noopener">карточка №4278 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Жилой дом</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3510" target="_blank" rel="noopener">карточка №3510 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Здание городской думы, с балкона которого в 1937 г. выступал деятель международного коммунистического движения Г.Димитров</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1751" target="_blank" rel="noopener">карточка №1751 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Здание земской больницы</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4811" target="_blank" rel="noopener">карточка №4811 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Земское училище</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2366" target="_blank" rel="noopener">карточка №2366 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Караульный флигель</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3225" target="_blank" rel="noopener">карточка №3225 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Лавка торговая</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3508" target="_blank" rel="noopener">карточка №3508 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Литейная мастерская</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4273" target="_blank" rel="noopener">карточка №4273 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Родильное отделение</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3226" target="_blank" rel="noopener">карточка №3226 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Служебная постройка</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4507" target="_blank" rel="noopener">карточка №4507 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Ткацкая фабрика Агеева</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2362" target="_blank" rel="noopener">карточка №2362 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Тюремный комплекс</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3517" target="_blank" rel="noopener">карточка №3517 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Училище начальное</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4318" target="_blank" rel="noopener">карточка №4318 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Хозяйственная палатка</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2380" target="_blank" rel="noopener">карточка №2380 ↗</a></div><div class="obj" data-st="Подготовка к торгам"><div class="oname">Четыре служебных постройки</div><div class="badges"><span class="b st">Подготовка к торгам</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4645" target="_blank" rel="noopener">карточка №4645 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">«Ансамбль земской больницы, кон. XIX в.: Корпус № 2», кон. XIX в.</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4279" target="_blank" rel="noopener">карточка №4279 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Ансамбль строений жилого и хозяйственного назначения</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2363" target="_blank" rel="noopener">карточка №2363 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Главный дом конца XIX в.</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1678" target="_blank" rel="noopener">карточка №1678 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом XIX в.</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1607" target="_blank" rel="noopener">карточка №1607 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом Барановых</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/4304" target="_blank" rel="noopener">карточка №4304 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом Шаховской</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1644" target="_blank" rel="noopener">карточка №1644 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3514" target="_blank" rel="noopener">карточка №3514 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3515" target="_blank" rel="noopener">карточка №3515 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2373" target="_blank" rel="noopener">карточка №2373 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2360" target="_blank" rel="noopener">карточка №2360 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2309" target="_blank" rel="noopener">карточка №2309 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2359" target="_blank" rel="noopener">карточка №2359 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2355" target="_blank" rel="noopener">карточка №2355 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2358" target="_blank" rel="noopener">карточка №2358 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2357" target="_blank" rel="noopener">карточка №2357 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2365" target="_blank" rel="noopener">карточка №2365 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3211" target="_blank" rel="noopener">карточка №3211 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой А.В.Нарышкина</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1363" target="_blank" rel="noopener">карточка №1363 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой Иванова А.А.</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3227" target="_blank" rel="noopener">карточка №3227 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой Кулеминых</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1867" target="_blank" rel="noopener">карточка №1867 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой М.Черногубовой</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2361" target="_blank" rel="noopener">карточка №2361 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой Макаровых (Шишеловых)</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2372" target="_blank" rel="noopener">карточка №2372 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой Таганцева</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3520" target="_blank" rel="noopener">карточка №3520 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой начала XIX в.</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3523" target="_blank" rel="noopener">карточка №3523 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом жилой скорняка Галочкина</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1778" target="_blank" rel="noopener">карточка №1778 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Дом, в котором в 1892 - 1913 гг. жил  В.Т. Трефолев</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3212" target="_blank" rel="noopener">карточка №3212 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Корпус торговых рядов</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2305" target="_blank" rel="noopener">карточка №2305 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Корпус № 1 торговых рядов</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/1480" target="_blank" rel="noopener">карточка №1480 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Лавка торговая</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3519" target="_blank" rel="noopener">карточка №3519 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Усадебный дом Мичуриных</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2371" target="_blank" rel="noopener">карточка №2371 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Усадьба Шаховских</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/3229" target="_blank" rel="noopener">карточка №3229 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Флигель</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2369" target="_blank" rel="noopener">карточка №2369 ↗</a></div><div class="obj" data-st="Решение отсутствует"><div class="oname">Хозяйственная постройка в составе усадьбы Василево</div><div class="badges"><span class="b st">Решение отсутствует</span></div><a class="oid" href="https://наследие.культура.рф/okn/portal/objects/2368" target="_blank" rel="noopener">карточка №2368 ↗</a></div></div>
+</main>
+
+<script>
+/* параллакс обложки: scroll + лёгкий дрейф за мышью (десктоп) */
+(function(){
+  var el = document.querySelector('.hero .bgimg');
+  if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var mx = 0, my = 0, sy = 0, raf = null, fine = window.matchMedia('(pointer: fine)').matches;
+  function frame(){
+    el.style.setProperty('--par', (sy * 0.28 + my) + 'px');
+    el.style.setProperty('--pmx', mx + 'px');
+    raf = null;
+  }
+  function queue(){ if (!raf) raf = requestAnimationFrame(frame); }
+  addEventListener('scroll', function(){ sy = Math.min(scrollY, 600); queue(); }, { passive: true });
+  if (fine) addEventListener('pointermove', function(e){
+    mx = (e.clientX / innerWidth - .5) * 14; my = (e.clientY / innerHeight - .5) * 10; queue();
+  }, { passive: true });
+  queue();
+})();
+</script>
+<script>
+/* liquid glass: блик следует за курсором (только для .lq) */
+(function(){
+  document.querySelectorAll('.lq, .chip').forEach(function(el){
+    el.addEventListener('pointermove', function(e){
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+    el.addEventListener('pointerleave', function(){
+      el.style.removeProperty('--mx'); el.style.removeProperty('--my');
+    });
+  });
+})();
+</script>
+<script>
+/* футер: появление при входе в viewport */
+(function(){
+  var w = document.querySelector('footer .wrap');
+  if (!w) return;
+  if (!('IntersectionObserver' in window)) { w.classList.add('in'); return; }
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .12 });
+  io.observe(w);
+})();
+</script>
+<footer>
+  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between">
+    <div style="flex:1;min-width:260px">
+      <div class="brand">ЛОТ <span>44</span></div>
+      Неофициальный агрегатор имущественных торгов Костромской области.<br>
+      Данные: портал торгов torgi.gov.ru. Лоты, относящиеся к объектам культурного наследия,
+      отмечены значком «ОКН». Не является офертой и юридической консультацией. Решения принимаете вы.
+    </div>
+    <div style="min-width:160px">
+      <div style="color:#fff;font-weight:600;margin-bottom:8px">Канал</div>
+      <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  var chips = document.querySelectorAll('#hchips .chip');
+  var cards = document.querySelectorAll('#hgrid .obj');
+  var count = document.getElementById('hcount');
+  chips.forEach(function(ch) {
+    ch.addEventListener('click', function() {
+      chips.forEach(function(c) { c.classList.remove('on'); });
+      ch.classList.add('on');
+      var st = ch.getAttribute('data-st');
+      var shown = 0;
+      cards.forEach(function(card) {
+        var show = (st === '__all__') || (card.getAttribute('data-st') === st);
+        card.style.display = show ? '' : 'none';
+        if (show) shown++;
+      });
+      count.textContent = 'Показано: ' + shown + ' из 115';
+    });
+  });
+})();
+</script>
+</body>
+</html>
