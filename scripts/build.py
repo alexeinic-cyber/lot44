@@ -1227,7 +1227,7 @@ def render_heritage(objs: list[dict], updated: str) -> str:
         name = o.get("name") or "Без названия"
         oid = o.get("id") or ""
         link = (
-            '<a class="oid" href="https://наследие.культура.рф/okn/portal/objects/%s" target="_blank" rel="noopener">карточка №%s ↗</a>'
+            '<a class="oid" href="https://xn--80aicbopm7a.xn--d1aqf.xn--p1ai/okn/%s" target="_blank" rel="noopener">карточка №%s ↗</a>'
             % (esc(oid), esc(oid))
             if oid
             else ""
@@ -1271,7 +1271,7 @@ def render_heritage(objs: list[dict], updated: str) -> str:
       <a class="tab" href="legislation.html">Законодательство</a>
     </div>
     <div class="meta">Обновлено: {esc(updated)} · объектов в реестре: {total}
-      · источник: <a href="https://наследие.культура.рф" target="_blank" rel="noopener">наследие.культура.рф</a></div>
+      · источник: <a href="https://xn--80aicbopm7a.xn--d1aqf.xn--p1ai" target="_blank" rel="noopener">наследие.культура.рф</a></div>
   </div>
 </header>
 <div class="controls">
