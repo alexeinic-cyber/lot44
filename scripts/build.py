@@ -836,6 +836,7 @@ def render_torgi(lots: list[dict], updated: str) -> str:
     <div class="tabs">
       <span class="tab on">Торги</span>
       <a class="tab" href="analytics.html">Аналитика</a>
+      <a class="tab" href="heritage.html">Наследие</a>
       <a class="tab" href="legislation.html">Законодательство</a>
     </div>
     <div class="meta">Обновлено: {esc(updated)} · активных лотов: {len(lots)}
@@ -1129,6 +1130,7 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
     <div class="tabs">
       <a class="tab" href="index.html">Торги</a>
       <span class="tab on">Аналитика</span>
+      <a class="tab" href="heritage.html">Наследие</a>
       <a class="tab" href="legislation.html">Законодательство</a>
     </div>
     <div class="meta">Обновлено: {esc(updated)} · активных лотов: {len(active)} · объектов «Наследия»: {len(objs) if objs else "—"}
@@ -1208,6 +1210,104 @@ def render_analytics(lots: list[dict], objs: list[dict], updated: str) -> str:
 """
 
 
+def render_heritage(objs: list[dict], updated: str) -> str:
+    """Раздел «Наследие»: реестр объектов культурного наследия региона."""
+    if not objs:
+        objs = load_cache("heritage.json") or []
+    status_counts = Counter(o.get("status") or "статус не указан" for o in objs)
+    status_order = [s for s, _ in status_counts.most_common()]
+    chips = "".join(
+        '<button type="button" class="chip%s" data-st="%s">%s · %d</button>'
+        % (" on" if i == 0 else "", esc(s), esc(s), status_counts[s])
+        for i, s in enumerate(status_order)
+    )
+    cards = []
+    for o in sorted(objs, key=lambda x: ((x.get("status") or ""), (x.get("name") or ""))):
+        st = o.get("status") or "статус не указан"
+        name = o.get("name") or "Без названия"
+        oid = o.get("id") or ""
+        link = (
+            '<a class="oid" href="https://наследие.культура.рф/okn/portal/objects/%s" target="_blank" rel="noopener">карточка №%s ↗</a>'
+            % (esc(oid), esc(oid))
+            if oid
+            else ""
+        )
+        cards.append(
+            '<div class="obj" data-st="%s"><div class="oname">%s</div>'
+            '<div class="badges"><span class="b st">%s</span></div>%s</div>'
+            % (esc(st), esc(name), esc(st), link)
+        )
+    total = len(objs)
+    return f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Объекты культурного наследия Костромской области | ЛОТ 44</title>
+<meta name="description" content="Реестр объектов культурного наследия Костромской области на платформе «Наследие» ДОМ.РФ: статусы охраны, названия, ссылки на карточки.">
+<style>{CSS}
+.obj .oname{{font-weight:700;font-size:15px;line-height:1.35}}
+.obj .b.st{{background:#fef3c7;color:#92400e}}
+.obj .oid{{font-size:13px;color:var(--blue);text-decoration:none;font-weight:600}}
+.obj .oid:hover{{text-decoration:underline}}
+#hcount{{font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="bgimg" aria-hidden="true"></div><div class="bgshade" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="brandrow"><div class="l">ЛОТ <span class="n">44</span></div>
+      <span style="color:#9fb0d0;font-size:14px">наследие</span></div>
+    <div class="anniv"><span class="dot"></span> Ипатьевскому монастырю — 700 лет · Кострома</div>
+    <h1>Объекты культурного наследия области</h1>
+    <p>Реестр объектов культурного наследия Костромской области по данным платформы
+       <strong>«Наследие» ДОМ.РФ</strong>: что уже под охраной и с каким статусом.
+       Для инвесторов — ориентир: такие объекты требуют охранного обязательства по 73-ФЗ.</p>
+    <div class="tabs">
+      <a class="tab" href="index.html">Торги</a>
+      <a class="tab" href="analytics.html">Аналитика</a>
+      <span class="tab on">Наследие</span>
+      <a class="tab" href="legislation.html">Законодательство</a>
+    </div>
+    <div class="meta">Обновлено: {esc(updated)} · объектов в реестре: {total}
+      · источник: <a href="https://наследие.культура.рф" target="_blank" rel="noopener">наследие.культура.рф</a></div>
+  </div>
+</header>
+<div class="controls">
+  <div class="chips" id="hchips">{chips}</div>
+  <span class="count" id="hcount">Показано: {total} из {total}</span>
+</div>
+<main>
+  <div class="grid" id="hgrid">{''.join(cards) if cards else '<div class="empty">Реестр пока пуст — обновим при следующей сборке.</div>'}</div>
+</main>
+{footer_html()}
+<script>
+(function() {{
+  var chips = document.querySelectorAll('#hchips .chip');
+  var cards = document.querySelectorAll('#hgrid .obj');
+  var count = document.getElementById('hcount');
+  chips.forEach(function(ch) {{
+    ch.addEventListener('click', function() {{
+      chips.forEach(function(c) {{ c.classList.remove('on'); }});
+      ch.classList.add('on');
+      var st = ch.getAttribute('data-st');
+      var shown = 0;
+      cards.forEach(function(card) {{
+        var show = (st === '__all__') || (card.getAttribute('data-st') === st);
+        card.style.display = show ? '' : 'none';
+        if (show) shown++;
+      }});
+      count.textContent = 'Показано: ' + shown + ' из {total}';
+    }});
+  }});
+}})();
+</script>
+</body>
+</html>
+"""
+
+
 def render_legislation(updated: str) -> str:
     """Курируемая карта законодательства: просветительский раздел."""
     return f"""<!DOCTYPE html>
@@ -1238,6 +1338,7 @@ def render_legislation(updated: str) -> str:
     <div class="tabs">
       <a class="tab" href="index.html">Торги</a>
       <a class="tab" href="analytics.html">Аналитика</a>
+      <a class="tab" href="heritage.html">Наследие</a>
       <span class="tab on">Законодательство</span>
     </div>
     <div class="meta">Обновлено: {esc(updated)} · канал: <a href="https://vk.ru/lot44" target="_blank" rel="noopener">vk.ru/lot44</a></div>
@@ -1451,6 +1552,7 @@ def main() -> int:
 
     (SITE / "index.html").write_text(render_torgi(lots, updated), encoding="utf-8")
     (SITE / "analytics.html").write_text(render_analytics(lots, objs, updated), encoding="utf-8")
+    (SITE / "heritage.html").write_text(render_heritage(objs, updated), encoding="utf-8")
     (SITE / "legislation.html").write_text(render_legislation(updated), encoding="utf-8")
     print(f"[ok] site/legislation.html (законы)")
 
