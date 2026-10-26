@@ -269,7 +269,27 @@ def format_deadline(s: Any) -> tuple[str, int | None]:
     if not s:
         return "—", None
     s = str(s)
-    # ISO or "2026-09-30T17:00:00"
+    # ISO с явным смещением: torgi.gov.ru отдаёт UTC (…T07:00:00.000+00:00 = 10:00 МСК)
+    m_full = re.search(
+        r"(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(Z|z|[+-]\d{2}:?\d{2})",
+        s,
+    )
+    if m_full:
+        y, mo, d, hh, mm, off = m_full.groups()
+        try:
+            if off in ("Z", "z"):
+                tz = timezone.utc
+            else:
+                sign = 1 if off[0] == "+" else -1
+                digits = off[1:].replace(":", "")
+                tz = timezone(sign * timedelta(hours=int(digits[:2]), minutes=int(digits[2:])))
+            dt_utc = datetime(int(y), int(mo), int(d), int(hh), int(mm), tzinfo=tz)
+            dt_msk = dt_utc.astimezone(MSK)
+            left = (dt_msk.date() - now_msk().date()).days
+            return f"до {dt_msk.strftime('%d.%m.%Y, %H:%M')} МСК", left
+        except Exception:
+            pass
+    # ISO без зоны — считаем уже в МСК (старое поведение)
     m = re.search(r"(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})", s)
     if not m:
         m2 = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", s)
